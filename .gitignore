@@ -1,0 +1,7 @@
+# Node/Astro
+node_modules/
+dist/
+.env*
+.vercel/
+.netlify/
+.DS_Store

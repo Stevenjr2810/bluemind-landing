@@ -1,0 +1,104 @@
+---
+import Container from "../ui/Container.astro";
+import {
+    Baby,
+    Calendar,
+    DollarSign,
+    MapPin,
+    Mail,
+    Phone,
+    Facebook,
+} from "lucide-astro";
+
+const data = {
+    age: "6+ years old",
+    days: "Monday to Saturday",
+    rate: "$150 / hour (private)",
+    location: "Queens – South Ozone Park, New York 11420",
+    email: "bluemindskillss@gmail.com",
+    phone: "+1 929-765-3327",
+    facebook: "https://www.facebook.com/profile.php?id=61580481075864",
+};
+---
+
+<section
+    id="about"
+    class="bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-700 text-white"
+>
+    <Container class="py-16 sm:py-24">
+        <div class="grid gap-8 lg:grid-cols-2">
+            <div>
+                <h2 class="text-3xl font-bold tracking-tight sm:text-4xl">
+                    Open to the public
+                </h2>
+                <p class="mt-4 text-white/80">
+                    Personalized training tailored to each learner’s needs — at
+                    our center or from the comfort of your home. Learn robotics,
+                    electronics and programming in a fun, hands-on way.
+                </p>
+
+                <ul class="mt-6 space-y-3 text-white/90">
+                    <li class="flex items-center gap-2">
+                        <Baby class="w-5 h-5 text-cyan-400" />
+                        <span class="font-semibold">Age group:</span>
+                        {data.age}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <Calendar class="w-5 h-5 text-cyan-400" />
+                        <span class="font-semibold">Schedule:</span>
+                        {data.days}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <DollarSign class="w-5 h-5 text-cyan-400" />
+                        <span class="font-semibold">Private rate:</span>
+                        {data.rate}
+                    </li>
+                    <li class="flex items-center gap-2">
+                        <MapPin class="w-5 h-5 text-cyan-400" />
+                        <span class="font-semibold">Location:</span>
+                        {data.location}
+                    </li>
+                </ul>
+            </div>
+
+            <aside
+                class="rounded-2xl border border-white/15 bg-white/10 p-6 backdrop-blur"
+            >
+                <h3 class="text-xl font-semibold">Contact us</h3>
+                <p class="mt-2 text-white/80">
+                    We’ll help you choose the best program for you.
+                </p>
+                <div class="mt-4 space-y-2">
+                    <a
+                        href={`mailto:${data.email}`}
+                        class="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 hover:bg-white/15"
+                    >
+                        <Mail class="w-5 h-5 text-cyan-400" />
+                        {data.email}
+                    </a>
+                    <a
+                        href={`tel:${data.phone.replaceAll(" ", "")}`}
+                        class="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 hover:bg-white/15"
+                    >
+                        <Phone class="w-5 h-5 text-cyan-400" />
+                        {data.phone}
+                    </a>
+                    <a
+                        href={data.facebook}
+                        target="_blank"
+                        class="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 hover:bg-white/15"
+                    >
+                        <Facebook class="w-5 h-5 text-cyan-400" /> Facebook
+                    </a>
+                </div>
+
+                <a
+                    href="#contact"
+                    class="mt-6 inline-flex items-center justify-center gap-2 rounded-full bg-pink-500 px-5 py-3 font-semibold text-white hover:bg-pink-400"
+                >
+                    Get Started
+                </a>
+            </aside>
+        </div>
+    </Container>
+</section>

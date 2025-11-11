@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Importa las variables del tema de Flowbite */
+@import "flowbite/src/themes/default";
+
+/* Puedes agregar aquí tus estilos globales si deseas */

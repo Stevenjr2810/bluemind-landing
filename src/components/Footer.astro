@@ -1,0 +1,138 @@
+---
+import { Facebook, Instagram, Youtube, Mail, Phone, MapPin } from "lucide-astro";
+
+/** Contenido editable */
+const brand = {
+  name: "Bluemind Skills",
+  tagline: "Robotics & Coding",
+  logo: "logo.png", 
+};
+
+const nav = {
+  programs: [
+    { label: "Robotics Basics", href: "#features" },
+    { label: "Coding for Kids", href: "#features" },
+    { label: "Private Lessons", href: "#about" },
+    { label: "Projects", href: "#projects" },
+  ],
+  company: [
+    { label: "About", href: "#about" },
+    { label: "FAQs", href: "#faqs" },
+    { label: "Pricing", href: "#pricing" },
+    { label: "Contact", href: "#contact" },
+  ],
+};
+
+const contact = {
+  email: "bluemindskillss@gmail.com",
+  phoneLabel: "+1 929-765-3327",
+  phoneHref: "tel:+19297653327",
+  address: "Queens – South Ozone Park, New York 11420",
+  facebook: "https://www.facebook.com/people/BLUE-MINDS/61580481075864/",
+  instagram: "#",
+  youtube: "#",
+};
+---
+
+<footer class="relative bg-zinc-950 text-zinc-200">
+  <!-- divisor superior con gradiente -->
+  <div class="h-px w-full bg-gradient-to-r from-transparent via-pink-500/40 to-transparent"></div>
+
+  <div class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div class="grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+      <!-- Brand -->
+      <div>
+        <a href="#home" class="inline-flex items-center gap-3">
+          {brand.logo ? (
+            <img src={brand.logo} alt={brand.name} class="h-9 w-auto" />
+          ) : null}
+          <div>
+            <p class="text-lg font-semibold text-white">{brand.name}</p>
+            <p class="text-sm text-zinc-400">{brand.tagline}</p>
+          </div>
+        </a>
+        <p class="mt-4 max-w-xs text-sm text-zinc-400">
+          Personalized tech training for kids and adults. Learn by building real projects in robotics, electronics and programming.
+        </p>
+      </div>
+
+      <!-- Programs -->
+      <nav aria-label="Programs">
+        <h3 class="text-sm font-semibold text-white">Programs</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          {nav.programs.map((i) => (
+            <li>
+              <a href={i.href} class="text-zinc-400 transition hover:text-white">
+                {i.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <!-- Company -->
+      <nav aria-label="Company">
+        <h3 class="text-sm font-semibold text-white">Company</h3>
+        <ul class="mt-4 space-y-2 text-sm">
+          {nav.company.map((i) => (
+            <li>
+              <a href={i.href} class="text-zinc-400 transition hover:text-white">
+                {i.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <!-- Contact -->
+      <div>
+        <h3 class="text-sm font-semibold text-white">Contact</h3>
+        <ul class="mt-4 space-y-3 text-sm">
+          <li class="flex items-start gap-3">
+            <Mail class="h-5 w-5 text-pink-400" />
+            <a href={`mailto:${contact.email}`} class="text-zinc-400 hover:text-white transition">
+              {contact.email}
+            </a>
+          </li>
+          <li class="flex items-start gap-3">
+            <Phone class="h-5 w-5 text-pink-400" />
+            <a href={contact.phoneHref} class="text-zinc-400 hover:text-white transition">
+              {contact.phoneLabel}
+            </a>
+          </li>
+          <li class="flex items-start gap-3">
+            <MapPin class="h-5 w-5 text-pink-400" />
+            <span class="text-zinc-400">{contact.address}</span>
+          </li>
+        </ul>
+
+        <!-- Social -->
+        <div class="mt-5 flex items-center gap-3">
+          <a href={contact.facebook} aria-label="Facebook" target="_blank" class="rounded-full bg-white/5 p-2 text-zinc-300 transition hover:bg-white/10 hover:text-white">
+            <Facebook class="h-5 w-5" />
+          </a>
+          <a href={contact.instagram} aria-label="Instagram" target="_blank" class="rounded-full bg-white/5 p-2 text-zinc-300 transition hover:bg-white/10 hover:text-white">
+            <Instagram class="h-5 w-5" />
+          </a>
+          <a href={contact.youtube} aria-label="YouTube" target="_blank" class="rounded-full bg-white/5 p-2 text-zinc-300 transition hover:bg-white/10 hover:text-white">
+            <Youtube class="h-5 w-5" />
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- barra inferior -->
+    <div class="flex flex-col items-center justify-between gap-4 border-t border-white/10 py-6 text-xs text-zinc-400 sm:flex-row">
+      <p>© {new Date().getFullYear()} {brand.name}. All rights reserved.</p>
+
+      <div class="flex items-center gap-4">
+        <a href="#privacy" class="hover:text-white">Privacy</a>
+        <span class="opacity-40">•</span>
+        <a href="#terms" class="hover:text-white">Terms</a>
+        <span class="opacity-40">•</span>
+        <a href="#cookies" class="hover:text-white">Cookies</a>
+        <a href="#home" class="ml-4 rounded-full bg-white/5 px-3 py-1.5 text-zinc-200 hover:bg-white/10">Back to top ↑</a>
+      </div>
+    </div>
+  </div>
+</footer>

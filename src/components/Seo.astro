@@ -1,0 +1,35 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const {
+  title = "Bluemind Skills",
+  description = "Personalized robotics and coding training for kids and adults.",
+  noindex = false,
+} = Astro.props as Props;
+
+// Usa la URL actual sin depender de astro.config
+const canonical = Astro.url?.toString() || "/";
+---
+<title>{title}</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="description" content={description} />
+<link rel="canonical" href={canonical} />
+{noindex && <meta name="robots" content="noindex,nofollow" />}
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content="/images/og-banner.jpg" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content="/images/og-banner.jpg" />

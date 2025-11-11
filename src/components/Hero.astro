@@ -1,0 +1,96 @@
+---
+import Container from "../components/ui/Container.astro";
+import ImageCarousel from "./ui/ImagenCarousel";
+
+const brand = "Bluemind Skills";
+const tagline = "Empowering minds through technology.";
+const title = "Learn Robotics and Coding in a Fun, Hands-On Way";
+const subtitle =
+    "Personalized tech training for kids and adults at our center or from the comfort of your home. Explore the exciting world of robotics, electronics, and programming through practical, creative learning.";
+const primaryCta = { label: "Join a Class", href: "#contact" };
+const secondaryCta = { label: "Learn More", href: "#about" };
+
+// Partner logos (opcional)
+const partners = [];
+---
+
+<section
+    id="home"
+    class="relative overflow-hidden bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-700 text-white"
+>
+    <!-- Fondo decorativo -->
+    <div
+        aria-hidden="true"
+        class="pointer-events-none absolute inset-0 bg-[radial-gradient(60%_40%_at_50%_-20%,rgba(236,72,153,0.25),transparent)]"
+    >
+    </div>
+
+    <Container class="relative py-24 sm:py-32">
+        <!-- Encabezado -->
+        <div class="mx-auto max-w-3xl text-center">
+            <span
+                class="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs/6 text-white/70"
+            >
+                <span class="h-1.5 w-1.5 rounded-full bg-pink-400"></span>
+                {tagline}
+            </span>
+
+            <h1
+                class="mt-6 text-4xl font-bold tracking-tight text-white sm:text-6xl"
+            >
+                {title}
+            </h1>
+
+            <p class="mx-auto mt-6 max-w-2xl text-lg text-white/80">
+                {subtitle}
+            </p>
+
+            <!-- Botones -->
+            <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+                <a
+                    href={primaryCta.href}
+                    class="inline-flex items-center rounded-full bg-pink-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition-transform hover:scale-105 hover:bg-pink-400"
+                >
+                    {primaryCta.label}
+                </a>
+                <a
+                    href={secondaryCta.href}
+                    class="inline-flex items-center rounded-full border border-white/15 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10"
+                >
+                    {secondaryCta.label}
+                </a>
+            </div>
+
+            <!-- Social proof -->
+            {
+                partners.length > 0 && (
+                    <div class="mt-12">
+                        <p class="text-xs uppercase tracking-widest text-white/50">
+                            Trusted by
+                        </p>
+                        <div class="mt-4 flex flex-wrap items-center justify-center gap-6 opacity-80">
+                            {partners.map((p) => (
+                                <img
+                                    src={`/partners/${p}`}
+                                    alt="partner"
+                                    class="h-6 sm:h-7"
+                                />
+                            ))}
+                        </div>
+                    </div>
+                )
+            }
+        </div>
+
+        <!-- Imagen / Mockup -->
+        <ImageCarousel
+            client:load
+            images={[
+                "robotics-1.jpg",
+                "robotics-2.jpg",
+                "robotics-3.jpg",
+            ]}
+            interval={4000}
+        />
+    </Container>
+</section>
