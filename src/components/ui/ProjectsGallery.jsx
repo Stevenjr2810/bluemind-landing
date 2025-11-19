@@ -13,7 +13,7 @@ export default function ProjectsGallery() {
   const FOLDER_NAME = "Gallery";
   
   // 🔧 API endpoint - detecta automáticamente el entorno
-  const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001';
+  const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
   const API_ENDPOINT = `${API_BASE_URL}/api/gallery/${FOLDER_NAME}`;
 
   useEffect(() => {

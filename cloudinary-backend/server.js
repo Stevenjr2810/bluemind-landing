@@ -5,6 +5,17 @@ require('dotenv').config();
 
 const app = express();
 
+const corsOptions = {
+  origin: [
+    'http://localhost:4321',
+    'http://localhost:3000',
+    'https://bluemindr.netlify.app',  // ✅ Tu sitio
+    'https://*.netlify.app'            // Para previews
+  ],
+  credentials: true
+};
+
+
 app.use(cors());
 app.use(express.json());
 
