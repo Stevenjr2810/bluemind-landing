@@ -8,51 +8,68 @@ export default function ProjectsGallery() {
   const [error, setError] = useState(null);
   const [itemsToShow, setItemsToShow] = useState(6);
 
-  const apiKey = "AIzaSyAjnpvI-rPVtYen7w5vAYfPUP_BPUcD2lQ";
-  const folderId = "10LM8tv9iqblme4hB2BRQ0ks5dHNOH6IV";
+  // ⚙️ CONFIGURACIÓN
+  const CLOUD_NAME = "drzikaxoj";
+  const FOLDER_NAME = "Gallery";
+  
+  // 🔧 Tu backend API
+  const API_ENDPOINT = `http://localhost:3001/api/gallery/${FOLDER_NAME}`;
+  
+  // 🔧 Para producción, cambia a tu dominio:
+  // const API_ENDPOINT = `https://tu-backend.com/api/gallery/${FOLDER_NAME}`;
 
   useEffect(() => {
-    const fetchFiles = async () => {
-      try {
-        const response = await fetch(
-          `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink,webContentLink)&pageSize=50`
-        );
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error?.message || 'Error al obtener archivos');
-        }
-        
-        const data = await response.json();
-        console.log("Archivos obtenidos:", data.files);
-        
-        const mediaFiles = (data.files || []).filter(file => 
-          file.mimeType.includes('image') || file.mimeType.includes('video')
-        );
-        
-        setFiles(mediaFiles);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error:", error);
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
     fetchFiles();
   }, []);
 
-  // URL para miniaturas - usando el API de Drive directamente
-  const getThumbnailUrl = (fileId) => {
-    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
+  const fetchFiles = async () => {
+    try {
+      console.log('🔍 Consultando:', API_ENDPOINT);
+      
+      const response = await fetch(API_ENDPOINT);
+      
+      if (!response.ok) {
+        throw new Error(`Error ${response.status}: No se pudieron obtener los archivos. Verifica que tu backend esté corriendo.`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Datos recibidos:', data);
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Error desconocido');
+      }
+      
+      const mediaFiles = data.resources.map(file => ({
+        id: file.public_id,
+        name: file.public_id.split('/').pop(),
+        type: file.resource_type,
+        format: file.format,
+        width: file.width,
+        height: file.height
+      }));
+      
+      setFiles(mediaFiles);
+      setLoading(false);
+    } catch (error) {
+      console.error("❌ Error:", error);
+      setError(error.message);
+      setLoading(false);
+    }
   };
 
-  const getFullImageUrl = (fileId) => {
-    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
+  const getThumbnailUrl = (file) => {
+    if (file.type === 'video') {
+      return `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/w_400,h_300,c_fill,q_auto/${file.id}.jpg`;
+    }
+    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_400,h_300,c_fill,q_auto,f_auto/${file.id}`;
   };
 
-  const getPublicVideoUrl = (fileId) => {
-    return `https://drive.google.com/file/d/${fileId}/preview`;
+  const getFullImageUrl = (file) => {
+    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_2000,q_auto,f_auto/${file.id}`;
+  };
+
+  const getVideoUrl = (file) => {
+    return `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/${file.id}.${file.format}`;
   };
 
   const openItem = (item) => {
@@ -80,20 +97,52 @@ export default function ProjectsGallery() {
         {loading && (
           <div className="text-center py-20">
             <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-white/20 border-t-white"></div>
-            <p className="mt-4 text-white/70">Loading projects...</p>
+            <p className="mt-4 text-white/70">Cargando proyectos...</p>
           </div>
         )}
 
         {error && (
           <div className="max-w-3xl mx-auto bg-red-950/30 border border-red-500/30 rounded-xl p-6">
-            <h3 className="text-red-300 font-semibold mb-2">⚠️ Error</h3>
-            <p className="text-red-200/80 text-sm">{error}</p>
+            <h3 className="text-red-300 font-semibold mb-2">⚠️ Error al cargar la galería</h3>
+            <p className="text-red-200/80 text-sm mb-4">{error}</p>
+            <div className="bg-zinc-900 p-4 rounded text-xs text-white/80 space-y-3">
+              <div>
+                <p className="font-semibold mb-1">🔍 Verifica:</p>
+                <ol className="list-decimal list-inside space-y-1 ml-2">
+                  <li>Tu backend está corriendo en <code className="bg-black/30 px-1 rounded">http://localhost:3001</code></li>
+                  <li>Ejecutaste <code className="bg-black/30 px-1 rounded">npm start</code> en la carpeta del backend</li>
+                  <li>El archivo .env tiene las credenciales correctas</li>
+                  <li>Hay archivos en la carpeta "{FOLDER_NAME}" en Cloudinary</li>
+                </ol>
+              </div>
+              <div className="border-t border-white/10 pt-3">
+                <p className="font-semibold mb-1">🧪 Prueba manualmente:</p>
+                <p className="text-white/60">
+                  Abre en tu navegador: <br/>
+                  <code className="bg-black/30 px-2 py-1 rounded text-xs break-all">
+                    {API_ENDPOINT}
+                  </code>
+                </p>
+              </div>
+            </div>
           </div>
         )}
 
         {!loading && !error && files.length === 0 && (
           <div className="text-center py-20">
-            <p className="text-white/60">No se encontraron archivos multimedia</p>
+            <div className="text-6xl mb-4">📂</div>
+            <p className="text-white/60 mb-2">No se encontraron archivos</p>
+            <p className="text-white/40 text-sm mb-6">
+              Sube imágenes o videos a Cloudinary en la carpeta "<strong>{FOLDER_NAME}</strong>"
+            </p>
+            <a 
+              href="https://console.cloudinary.com" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+            >
+              Ir a Cloudinary →
+            </a>
           </div>
         )}
 
@@ -105,51 +154,37 @@ export default function ProjectsGallery() {
               onClick={() => openItem(file)}
             >
               <div className="relative">
-                {file.mimeType.includes("video") ? (
-                  // Para videos: mostrar un placeholder con ícono
-                  <div className="w-full h-56 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="bg-white/10 rounded-full p-6 inline-block mb-3">
-                        <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-                        </svg>
-                      </div>
-                      <p className="text-white/60 text-xs px-4">Video</p>
+                <img
+                  src={getThumbnailUrl(file)}
+                  alt={file.name}
+                  className="w-full h-56 object-cover bg-zinc-800"
+                  loading="lazy"
+                />
+                
+                {file.type === 'video' && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="bg-black/60 rounded-full p-4">
+                      <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
+                      </svg>
                     </div>
                   </div>
-                ) : (
-                  // Para imágenes: cargar la imagen normalmente
-                  <img
-                    src={getThumbnailUrl(file.id)}
-                    alt={file.name}
-                    className="w-full h-56 object-cover bg-zinc-800"
-                    loading="lazy"
-                    onError={(e) => {
-                      console.error(`Error cargando: ${file.name}`, e);
-                      e.target.parentElement.innerHTML = `
-                        <div class="w-full h-56 bg-zinc-800 flex items-center justify-center">
-                          <div class="text-center p-4">
-                            <svg class="w-12 h-12 mx-auto text-white/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            <p class="text-xs text-white/60">Error al cargar</p>
-                          </div>
-                        </div>
-                      `;
-                    }}
-                    crossOrigin="anonymous"
-                  />
                 )}
                 
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                   <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
+                </div>
+
+                <div className="absolute top-2 right-2">
+                  <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                    {file.type === 'video' ? '🎥 Video' : '🖼️ Imagen'}
+                  </span>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* Botón de cargar más */}
         {!loading && !error && hasMore && (
           <div className="mt-12 text-center">
             <button
@@ -164,7 +199,6 @@ export default function ProjectsGallery() {
           </div>
         )}
 
-        {/* Modal/Lightbox */}
         {open && currentItem && (
           <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
@@ -178,52 +212,38 @@ export default function ProjectsGallery() {
             </button>
 
             <div
-              className="relative w-full max-w-6xl max-h-[90vh] overflow-hidden"
+              className="relative w-full max-w-6xl max-h-[90vh] overflow-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {currentItem.mimeType.includes("image") ? (
+              {currentItem.type === 'image' ? (
                 <div className="bg-zinc-900 rounded-lg overflow-hidden">
                   <img
-                    src={getFullImageUrl(currentItem.id)}
+                    src={getFullImageUrl(currentItem)}
                     alt={currentItem.name}
                     className="w-full h-auto max-h-[80vh] object-contain mx-auto"
-                    onError={(e) => {
-                      console.error("Error loading full image");
-                      e.target.parentElement.innerHTML = `
-                        <div class="w-full h-96 flex items-center justify-center bg-zinc-800">
-                          <div class="text-center">
-                            <p class="text-white/80 mb-2">No se pudo cargar la imagen</p>
-                            <p class="text-white/60 text-sm">${currentItem.name}</p>
-                          </div>
-                        </div>
-                      `;
-                    }}
                   />
                   <div className="p-4 bg-zinc-800">
                     <p className="text-white font-medium">{currentItem.name}</p>
+                    <p className="text-white/60 text-sm mt-1">
+                      {currentItem.width} × {currentItem.height} • {currentItem.format.toUpperCase()}
+                    </p>
                   </div>
                 </div>
-              ) : currentItem.mimeType.includes("video") ? (
+              ) : currentItem.type === 'video' ? (
                 <div className="bg-zinc-900 rounded-lg overflow-hidden">
-                  <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
-                    <iframe
-                      src={getPublicVideoUrl(currentItem.id)}
-                      className="absolute inset-0 w-full h-full"
-                      allow="autoplay; fullscreen; picture-in-picture"
-                      allowFullScreen
-                      sandbox="allow-scripts allow-same-origin allow-presentation"
-                    />
-                  </div>
+                  <video
+                    src={getVideoUrl(currentItem)}
+                    controls
+                    autoPlay
+                    className="w-full h-auto max-h-[80vh]"
+                  >
+                    Tu navegador no soporta el elemento de video.
+                  </video>
                   <div className="p-4 bg-zinc-800">
                     <p className="text-white font-medium">{currentItem.name}</p>
-                    <a 
-                      href={`https://drive.google.com/file/d/${currentItem.id}/view`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-sm mt-2 inline-block"
-                    >
-                      Abrir en Google Drive ↗
-                    </a>
+                    <p className="text-white/60 text-sm mt-1">
+                      {currentItem.width} × {currentItem.height} • {currentItem.format.toUpperCase()}
+                    </p>
                   </div>
                 </div>
               ) : null}
