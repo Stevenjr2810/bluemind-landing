@@ -12,11 +12,9 @@ export default function ProjectsGallery() {
   const CLOUD_NAME = "drzikaxoj";
   const FOLDER_NAME = "Gallery";
   
-  // 🔧 Tu backend API
-  const API_ENDPOINT = `http://localhost:3001/api/gallery/${FOLDER_NAME}`;
-  
-  // 🔧 Para producción, cambia a tu dominio:
-  // const API_ENDPOINT = `https://tu-backend.com/api/gallery/${FOLDER_NAME}`;
+  // 🔧 API endpoint - detecta automáticamente el entorno
+  const API_BASE_URL = import.meta.env.PUBLIC_API_URL || 'http://localhost:3001';
+  const API_ENDPOINT = `${API_BASE_URL}/api/gallery/${FOLDER_NAME}`;
 
   useEffect(() => {
     fetchFiles();
@@ -107,21 +105,24 @@ export default function ProjectsGallery() {
             <p className="text-red-200/80 text-sm mb-4">{error}</p>
             <div className="bg-zinc-900 p-4 rounded text-xs text-white/80 space-y-3">
               <div>
-                <p className="font-semibold mb-1">🔍 Verifica:</p>
-                <ol className="list-decimal list-inside space-y-1 ml-2">
-                  <li>Tu backend está corriendo en <code className="bg-black/30 px-1 rounded">http://localhost:3001</code></li>
-                  <li>Ejecutaste <code className="bg-black/30 px-1 rounded">npm start</code> en la carpeta del backend</li>
-                  <li>El archivo .env tiene las credenciales correctas</li>
-                  <li>Hay archivos en la carpeta "{FOLDER_NAME}" en Cloudinary</li>
-                </ol>
+                <p className="font-semibold mb-1">🔍 Información:</p>
+                <ul className="list-disc list-inside space-y-1 ml-2">
+                  <li>Backend URL: <code className="bg-black/30 px-1 rounded">{API_BASE_URL}</code></li>
+                  <li>Endpoint: <code className="bg-black/30 px-1 rounded">{API_ENDPOINT}</code></li>
+                </ul>
               </div>
               <div className="border-t border-white/10 pt-3">
                 <p className="font-semibold mb-1">🧪 Prueba manualmente:</p>
                 <p className="text-white/60">
                   Abre en tu navegador: <br/>
-                  <code className="bg-black/30 px-2 py-1 rounded text-xs break-all">
+                  <a 
+                    href={API_ENDPOINT} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="text-blue-400 hover:text-blue-300 break-all underline"
+                  >
                     {API_ENDPOINT}
-                  </code>
+                  </a>
                 </p>
               </div>
             </div>
