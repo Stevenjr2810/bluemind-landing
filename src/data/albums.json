@@ -1,44 +1,47 @@
-[
-  {
-    "id": "craft",
-    "title": "CRAFT",
-    "desc": "Cheerful and eye-catching designs: The giraffe and the cactus have cute, friendly expressions, making them perfect for children’s or school decorations..",
-    "cover": "cover1.jpg",
-    "items": [
-        { "type": "image", "src": "1-1.jpg" },
-      { "type": "image", "src": "1-2.jpg" },
-      { "type": "image", "src": "1-3.jpg" },
-      { "type": "image", "src": "1-4.jpg" },
-      { "type": "image", "src": "1-5.jpg" },
-      { "type": "image", "src": "1-6.jpg" },
-      { "type": "image", "src": "1-7.jpg" }
-    ]
-  },
-  {
-    "id": "tecnology",
-    "title": "TECHNOLOGY",
-    "desc": "This technology promotes hands-on learning in robotics, computational logic, and technological innovation.",
-    "cover": "cover2.jpg",
-    "items": [
-      { "type": "image", "src": "2-1.jpg" },
-      { "type": "video", "src": "video2-1.mp4" },
-      { "type": "video", "src": "video2-2.mp4" },
-      { "type": "video", "src": "video2-3.mp4" }
+{
+  "files": [
+    {
+      "id": "1",
+      "name": "Image 1",
+      "mimeType": "image/jpeg",
+      "thumbnailLink": "https://via.placeholder.com/300x200.png?text=Image+1",
+      "webViewLink": "https://via.placeholder.com/800x600.png?text=Image+1"
+    },
+    {
+      "id": "2",
+      "name": "Image 2",
+      "mimeType": "image/jpeg",
+      "thumbnailLink": "https://via.placeholder.com/300x200.png?text=Image+2",
+      "webViewLink": "https://via.placeholder.com/800x600.png?text=Image+2"
+    },
+    {
+      "id": "3",
+      "name": "Image 3",
+      "mimeType": "image/jpeg",
+      "thumbnailLink": "https://via.placeholder.com/300x200.png?text=Image+3",
+      "webViewLink": "https://via.placeholder.com/800x600.png?text=Image+3"
+    },
+    {
+      "id": "4",
+      "name": "Image 4",
+      "mimeType": "image/jpeg",
+      "thumbnailLink": "https://via.placeholder.com/300x200.png?text=Image+4",
+      "webViewLink": "https://via.placeholder.com/800x600.png?text=Image+4"
+    },
+    {
+      "id": "5",
+      "name": "Video 1",
+      "mimeType": "video/mp4",
+      "thumbnailLink": "https://via.placeholder.com/300x200.png?text=Video+1",
+      "webViewLink": "https://www.w3schools.com/html/mov_bbb.mp4"
+    },
+    {
+      "id": "6",
+      "name": "Video 2",
+      "mimeType": "video/mp4",
+      "thumbnailLink": "https://via.placeholder.com/300x200.png?text=Video+2",
+      "webViewLink": "https://www.w3schools.com/html/movie.mp4"
+    }
+  ]
+}
 
-      
-    ]
-  },
-
-  {
-    "id": "art",
-    "title": "ART",
-    "desc": "",
-    "cover": "cover3.jpg",
-    "items": [
-        { "type": "image", "src": "3-1.jpg" },
-      { "type": "image", "src": "3-2.jpg" }
-      
-    ]
-  }
-
-]

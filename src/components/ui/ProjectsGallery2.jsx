@@ -6,7 +6,6 @@ export default function ProjectsGallery() {
   const [currentItem, setCurrentItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [itemsToShow, setItemsToShow] = useState(6);
 
   const apiKey = "AIzaSyAjnpvI-rPVtYen7w5vAYfPUP_BPUcD2lQ";
   const folderId = "10LM8tv9iqblme4hB2BRQ0ks5dHNOH6IV";
@@ -15,7 +14,7 @@ export default function ProjectsGallery() {
     const fetchFiles = async () => {
       try {
         const response = await fetch(
-          `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,mimeType,thumbnailLink,webContentLink)&pageSize=50`
+          `https://www.googleapis.com/drive/v3/files?q='${folderId}'+in+parents+and+trashed=false&key=${apiKey}&fields=files(id,name,mimeType)&pageSize=50`
         );
         
         if (!response.ok) {
@@ -42,13 +41,9 @@ export default function ProjectsGallery() {
     fetchFiles();
   }, []);
 
-  // URL para miniaturas - usando el API de Drive directamente
-  const getThumbnailUrl = (fileId) => {
-    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
-  };
-
-  const getFullImageUrl = (fileId) => {
-    return `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media&key=${apiKey}`;
+  // Esta es la URL correcta para archivos públicos de Google Drive
+  const getPublicImageUrl = (fileId) => {
+    return `https://drive.google.com/uc?export=view&id=${fileId}`;
   };
 
   const getPublicVideoUrl = (fileId) => {
@@ -64,13 +59,6 @@ export default function ProjectsGallery() {
     setOpen(false);
     setCurrentItem(null);
   };
-
-  const loadMore = () => {
-    setItemsToShow(prev => prev + 6);
-  };
-
-  const displayedFiles = files.slice(0, itemsToShow);
-  const hasMore = itemsToShow < files.length;
 
   return (
     <section id="projects" className="bg-zinc-950 text-white py-16 sm:py-24 min-h-screen">
@@ -98,71 +86,52 @@ export default function ProjectsGallery() {
         )}
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displayedFiles.map((file) => (
+          {files.map((file) => (
             <div 
               key={file.id} 
               className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/50 hover:border-white/20 hover:bg-zinc-900 transition-all cursor-pointer group"
               onClick={() => openItem(file)}
             >
-              <div className="relative">
-                {file.mimeType.includes("video") ? (
-                  // Para videos: mostrar un placeholder con ícono
-                  <div className="w-full h-56 bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="bg-white/10 rounded-full p-6 inline-block mb-3">
-                        <svg className="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-                        </svg>
-                      </div>
-                      <p className="text-white/60 text-xs px-4">Video</p>
-                    </div>
-                  </div>
-                ) : (
-                  // Para imágenes: cargar la imagen normalmente
+              {file.mimeType.includes("image") ? (
+                <div className="relative">
                   <img
-                    src={getThumbnailUrl(file.id)}
+                    src={getPublicImageUrl(file.id)}
                     alt={file.name}
                     className="w-full h-56 object-cover bg-zinc-800"
                     loading="lazy"
                     onError={(e) => {
-                      console.error(`Error cargando: ${file.name}`, e);
+                      console.error(`Error cargando: ${file.name}`);
                       e.target.parentElement.innerHTML = `
                         <div class="w-full h-56 bg-zinc-800 flex items-center justify-center">
                           <div class="text-center p-4">
                             <svg class="w-12 h-12 mx-auto text-white/40 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            <p class="text-xs text-white/60">Error al cargar</p>
+                            <p class="text-xs text-white/60">${file.name}</p>
                           </div>
                         </div>
                       `;
                     }}
-                    crossOrigin="anonymous"
                   />
-                )}
-                
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
+                  </div>
                 </div>
-              </div>
+              ) : file.mimeType.includes("video") ? (
+                <div className="relative">
+                  <div className="w-full h-56 bg-zinc-800 flex items-center justify-center">
+                    <svg className="w-16 h-16 text-white/50" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
+                    </svg>
+                  </div>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                    <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
+                  </div>
+                </div>
+              ) : null}
             </div>
           ))}
         </div>
-
-        {/* Botón de cargar más */}
-        {!loading && !error && hasMore && (
-          <div className="mt-12 text-center">
-            <button
-              onClick={loadMore}
-              className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 hover:scale-105"
-            >
-              Cargar más
-            </button>
-            <p className="mt-4 text-white/50 text-sm">
-              Mostrando {displayedFiles.length} de {files.length} archivos
-            </p>
-          </div>
-        )}
 
         {/* Modal/Lightbox */}
         {open && currentItem && (
@@ -184,11 +153,10 @@ export default function ProjectsGallery() {
               {currentItem.mimeType.includes("image") ? (
                 <div className="bg-zinc-900 rounded-lg overflow-hidden">
                   <img
-                    src={getFullImageUrl(currentItem.id)}
+                    src={getPublicImageUrl(currentItem.id)}
                     alt={currentItem.name}
                     className="w-full h-auto max-h-[80vh] object-contain mx-auto"
                     onError={(e) => {
-                      console.error("Error loading full image");
                       e.target.parentElement.innerHTML = `
                         <div class="w-full h-96 flex items-center justify-center bg-zinc-800">
                           <div class="text-center">
@@ -211,19 +179,10 @@ export default function ProjectsGallery() {
                       className="absolute inset-0 w-full h-full"
                       allow="autoplay; fullscreen; picture-in-picture"
                       allowFullScreen
-                      sandbox="allow-scripts allow-same-origin allow-presentation"
                     />
                   </div>
                   <div className="p-4 bg-zinc-800">
                     <p className="text-white font-medium">{currentItem.name}</p>
-                    <a 
-                      href={`https://drive.google.com/file/d/${currentItem.id}/view`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-400 hover:text-blue-300 text-sm mt-2 inline-block"
-                    >
-                      Abrir en Google Drive ↗
-                    </a>
                   </div>
                 </div>
               ) : null}
@@ -231,13 +190,12 @@ export default function ProjectsGallery() {
           </div>
         )}
 
-        {!loading && !error && files.length > 0 && !hasMore && (
+        {!loading && !error && files.length > 0 && (
           <div className="mt-8 text-center text-white/60 text-sm">
-            Mostrando todos los archivos ({files.length})
+            {files.length} {files.length === 1 ? 'archivo encontrado' : 'archivos encontrados'}
           </div>
         )}
       </div>
     </section>
   );
 }
-
