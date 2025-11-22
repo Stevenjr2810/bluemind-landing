@@ -9,8 +9,8 @@ const corsOptions = {
   origin: [
     'http://localhost:4321',
     'http://localhost:3000',
-    'https://bluemindr.netlify.app',  // ✅ Tu sitio
-    'https://*.netlify.app'            // Para previews
+    'https://bluemindr.netlify.app',   // ✅ Tu sitio
+    'https://*.netlify.app'           // Para previews
   ],
   credentials: true
 };
@@ -26,11 +26,12 @@ cloudinary.config({
 });
 
 app.get('/', (req, res) => {
-  res.json({ 
+  res.json({
     message: 'Backend de Cloudinary funcionando ✅',
     endpoints: {
       'Galería completa': 'GET /api/gallery',
-      'Por carpeta de assets': 'GET /api/gallery/:folder'
+      'Por carpeta de assets': 'GET /api/gallery/:folder',
+      'Archivos de Flyers': 'GET /api/flyers' // <--- ¡Añadido aquí!
     }
   });
 });
@@ -39,7 +40,7 @@ app.get('/', (req, res) => {
 app.get('/api/gallery', async (req, res) => {
   try {
     console.log('\n📂 Obteniendo toda la galería...');
-    
+
     const [images, videos] = await Promise.all([
       cloudinary.api.resources({
         type: 'upload',
@@ -92,9 +93,9 @@ app.get('/api/gallery', async (req, res) => {
 app.get('/api/gallery/:folder', async (req, res) => {
   try {
     const { folder } = req.params;
-    
+
     console.log(`\n📂 Buscando archivos con asset_folder: "${folder}"`);
-    
+
     // Obtener TODOS los recursos
     const [images, videos] = await Promise.all([
       cloudinary.api.resources({
@@ -115,7 +116,7 @@ app.get('/api/gallery/:folder', async (req, res) => {
     ];
 
     // FILTRAR por asset_folder
-    const filtered = allResources.filter(resource => 
+    const filtered = allResources.filter(resource =>
       resource.asset_folder === folder
     );
 
@@ -147,13 +148,72 @@ app.get('/api/gallery/:folder', async (req, res) => {
   }
 });
 
+// NUEVO ENDPOINT DEDICADO PARA FLYERS
+app.get('/api/flyers', async (req, res) => {
+  try {
+    const folder = 'flyers'; // Especificamos la carpeta 'flyers' directamente
+
+    console.log(`\n📂 Buscando archivos en la carpeta dedicada: "${folder}"`);
+
+    const [images, videos] = await Promise.all([
+      cloudinary.api.resources({
+        type: 'upload',
+        max_results: 500,
+        resource_type: 'image'
+      }),
+      cloudinary.api.resources({
+        type: 'upload',
+        max_results: 500,
+        resource_type: 'video'
+      })
+    ]);
+
+    const allResources = [
+      ...images.resources.map(r => ({ ...r, resource_type: 'image' })),
+      ...videos.resources.map(r => ({ ...r, resource_type: 'video' }))
+    ];
+
+    const filtered = allResources.filter(resource =>
+      resource.asset_folder === folder
+    );
+
+    console.log(`✅ Encontrados ${filtered.length} archivos en "${folder}" (endpoint /api/flyers)`);
+
+    if (filtered.length === 0) {
+      const availableFolders = [...new Set(allResources.map(r => r.asset_folder).filter(Boolean))];
+      return res.status(404).json({
+        success: false,
+        message: `No se encontraron archivos en la carpeta "${folder}"`,
+        available_folders: availableFolders,
+        hint: `Carpetas disponibles: ${availableFolders.join(', ')}`
+      });
+    }
+
+    res.json({
+      success: true,
+      folder: folder,
+      total: filtered.length,
+      resources: filtered
+    });
+
+  } catch (error) {
+    console.error('❌ Error en el endpoint /api/flyers:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`
   🚀 Servidor corriendo en http://localhost:${PORT}
   
   📍 Endpoints:
-     📦 http://localhost:${PORT}/api/gallery (TODOS los archivos)
-     📁 http://localhost:${PORT}/api/gallery/Gallery (solo carpeta Gallery)
+    📦 http://localhost:${PORT}/api/gallery (TODOS los archivos)
+    📁 http://localhost:${PORT}/api/gallery/Gallery (solo carpeta Gallery)
+    📄 http://localhost:${PORT}/api/flyers (solo carpeta flyers)  <--- ¡Nuevo endpoint!
   `);
 });

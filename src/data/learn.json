@@ -2,26 +2,25 @@
   {
     "title": "Basic Electronics",
     "desc": "Understand circuits, sensors, motors and lights with hands-on activities.",
-    "icon": "chip"
+    "icon": "chip",
+    "image": "/skill1.png"
   },
   {
     "title": "Programming",
     "desc": "Write code to control robots, automate tasks and solve problems.",
-    "icon": "code"
+    "icon": "code",
+    "image": "/skill2.png"
   },
   {
     "title": "Design & Construction",
     "desc": "Build robots with parts, tools and creativity, from idea to prototype.",
-    "icon": "wrench"
+    "icon": "wrench",
+    "image": "skill3.png"
   },
   {
-    "title": "Applied Math",
-    "desc": "Use measurements, calculations and geometry in real projects.",
-    "icon": "math"
-  },
-  {
-    "title": "Specialized Software",
-    "desc": "Work with simulators, programming environments and 3D tools.",
-    "icon": "software"
+    "title": "Art",
+    "desc": "Art provides important benefits such as creativity, emotional expression, stress relief, and improved problem-solving skills.",
+    "icon": "art",
+    "image": "/skill4.jpeg"
   }
 ]

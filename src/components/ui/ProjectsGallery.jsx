@@ -8,11 +8,11 @@ export default function ProjectsGallery() {
   const [error, setError] = useState(null);
   const [itemsToShow, setItemsToShow] = useState(6);
 
-  // ⚙️ CONFIGURACIÓN
-  const CLOUD_NAME = "drzikaxoj";
+  // ⚙️ CONFIGURATION
+  const CLOUD_NAME = "drzikaxoj"; // Ensure this is your actual Cloudinary Cloud Name
   const FOLDER_NAME = "Gallery";
-  
-  // 🔧 API endpoint - detecta automáticamente el entorno
+
+  // 🔧 API endpoint - automatically detects the environment
   const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
   const API_ENDPOINT = `${API_BASE_URL}/api/gallery/${FOLDER_NAME}`;
 
@@ -22,30 +22,30 @@ export default function ProjectsGallery() {
 
   const fetchFiles = async () => {
     try {
-      console.log('🔍 Consultando:', API_ENDPOINT);
-      
+      console.log('🔍 Querying:', API_ENDPOINT);
+
       const response = await fetch(API_ENDPOINT);
-      
+
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: No se pudieron obtener los archivos. Verifica que tu backend esté corriendo.`);
+        throw new Error(`Error ${response.status}: Failed to fetch files. Please ensure your backend is running.`);
       }
-      
+
       const data = await response.json();
-      console.log('✅ Datos recibidos:', data);
-      
+      console.log('✅ Data received:', data);
+
       if (!data.success) {
-        throw new Error(data.error || 'Error desconocido');
+        throw new Error(data.error || 'Unknown error');
       }
-      
+
       const mediaFiles = data.resources.map(file => ({
         id: file.public_id,
-        name: file.public_id.split('/').pop(),
+        name: file.public_id.split('/').pop(), // Consider cleaning this name for display
         type: file.resource_type,
         format: file.format,
         width: file.width,
         height: file.height
       }));
-      
+
       setFiles(mediaFiles);
       setLoading(false);
     } catch (error) {
@@ -95,29 +95,29 @@ export default function ProjectsGallery() {
         {loading && (
           <div className="text-center py-20">
             <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-white/20 border-t-white"></div>
-            <p className="mt-4 text-white/70">Cargando proyectos...</p>
+            <p className="mt-4 text-white/70">Loading projects...</p>
           </div>
         )}
 
         {error && (
           <div className="max-w-3xl mx-auto bg-red-950/30 border border-red-500/30 rounded-xl p-6">
-            <h3 className="text-red-300 font-semibold mb-2">⚠️ Error al cargar la galería</h3>
+            <h3 className="text-red-300 font-semibold mb-2">⚠️ Error loading gallery</h3>
             <p className="text-red-200/80 text-sm mb-4">{error}</p>
             <div className="bg-zinc-900 p-4 rounded text-xs text-white/80 space-y-3">
               <div>
-                <p className="font-semibold mb-1">🔍 Información:</p>
+                <p className="font-semibold mb-1">🔍 Information:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>Backend URL: <code className="bg-black/30 px-1 rounded">{API_BASE_URL}</code></li>
                   <li>Endpoint: <code className="bg-black/30 px-1 rounded">{API_ENDPOINT}</code></li>
                 </ul>
               </div>
               <div className="border-t border-white/10 pt-3">
-                <p className="font-semibold mb-1">🧪 Prueba manualmente:</p>
+                <p className="font-semibold mb-1">🧪 Test manually:</p>
                 <p className="text-white/60">
-                  Abre en tu navegador: <br/>
-                  <a 
-                    href={API_ENDPOINT} 
-                    target="_blank" 
+                  Open in your browser: <br />
+                  <a
+                    href={API_ENDPOINT}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="text-blue-400 hover:text-blue-300 break-all underline"
                   >
@@ -132,25 +132,25 @@ export default function ProjectsGallery() {
         {!loading && !error && files.length === 0 && (
           <div className="text-center py-20">
             <div className="text-6xl mb-4">📂</div>
-            <p className="text-white/60 mb-2">No se encontraron archivos</p>
+            <p className="text-white/60 mb-2">No files found</p>
             <p className="text-white/40 text-sm mb-6">
-              Sube imágenes o videos a Cloudinary en la carpeta "<strong>{FOLDER_NAME}</strong>"
+              Upload images or videos to Cloudinary in the "<strong>{FOLDER_NAME}</strong>" folder
             </p>
-            <a 
-              href="https://console.cloudinary.com" 
-              target="_blank" 
+            <a
+              href="https://console.cloudinary.com"
+              target="_blank"
               rel="noopener noreferrer"
               className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
             >
-              Ir a Cloudinary →
+              Go to Cloudinary →
             </a>
           </div>
         )}
 
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {displayedFiles.map((file) => (
-            <div 
-              key={file.id} 
+            <div
+              key={file.id}
               className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/50 hover:border-white/20 hover:bg-zinc-900 transition-all cursor-pointer group"
               onClick={() => openItem(file)}
             >
@@ -161,7 +161,7 @@ export default function ProjectsGallery() {
                   className="w-full h-56 object-cover bg-zinc-800"
                   loading="lazy"
                 />
-                
+
                 {file.type === 'video' && (
                   <div className="absolute inset-0 flex items-center justify-center">
                     <div className="bg-black/60 rounded-full p-4">
@@ -171,14 +171,14 @@ export default function ProjectsGallery() {
                     </div>
                   </div>
                 )}
-                
+
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
                   <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
                 </div>
 
                 <div className="absolute top-2 right-2">
                   <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
-                    {file.type === 'video' ? '🎥 Video' : '🖼️ Imagen'}
+                    {file.type === 'video' ? '🎥 Video' : '🖼️ Image'}
                   </span>
                 </div>
               </div>
@@ -192,10 +192,10 @@ export default function ProjectsGallery() {
               onClick={loadMore}
               className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 hover:scale-105"
             >
-              Cargar más
+              Load more
             </button>
             <p className="mt-4 text-white/50 text-sm">
-              Mostrando {displayedFiles.length} de {files.length} archivos
+              Showing {displayedFiles.length} of {files.length} files
             </p>
           </div>
         )}
@@ -238,7 +238,7 @@ export default function ProjectsGallery() {
                     autoPlay
                     className="w-full h-auto max-h-[80vh]"
                   >
-                    Tu navegador no soporta el elemento de video.
+                    Your browser does not support the video tag.
                   </video>
                   <div className="p-4 bg-zinc-800">
                     <p className="text-white font-medium">{currentItem.name}</p>
@@ -254,7 +254,7 @@ export default function ProjectsGallery() {
 
         {!loading && !error && files.length > 0 && !hasMore && (
           <div className="mt-8 text-center text-white/60 text-sm">
-            Mostrando todos los archivos ({files.length})
+            Showing all files ({files.length})
           </div>
         )}
       </div>

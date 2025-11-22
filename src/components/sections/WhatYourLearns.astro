@@ -1,16 +1,8 @@
 ---
 import Container from "../ui/Container.astro";
 import items from "../../data/learn.json";
-
-// íconos inline (sin dependencias)
-const icons = {
-  chip: `<svg viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M9 3h6v2h2v2h2v6h-2v2h-2v2H9v-2H7v-2H5V7h2V5h2zM7 9v6h10V9H7z"/></svg>`,
-  code: `<svg viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="m9.4 16.6-1.8-1.8L9.4 13 8 11.6 4.6 15l3.4 3.4 1.4-1.8zm5.2 0 1.8-1.8-1.8-1.8L16 11.6l3.4 3.4L16 18.4l-1.4-1.8zM13 6l-3 12h2l3-12h-2z"/></svg>`,
-  wrench: `<svg viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M22 19.6 19.6 22l-7-7a5 5 0 1 1 2.4-2.4l7 7z"/></svg>`,
-  math: `<svg viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M5 7h6v2H5V7zm8 0h6v2h-6V7zM5 11h6v2H5v-2zm8 0h6v2h-6v-2zM5 15h6v2H5v-2z"/></svg>`,
-  software: `<svg viewBox="0 0 24 24" class="h-6 w-6"><path fill="currentColor" d="M3 5h18v14H3V5zm2 2v10h14V7H5zm3 2h8v2H8V9zm0 4h6v2H8v-2z"/></svg>`
-};
 ---
+
 <section id="features" class="bg-white text-slate-900">
   <Container class="py-16 sm:py-24">
     <header class="max-w-3xl">
@@ -19,21 +11,34 @@ const icons = {
         Practical skills to build, code and innovate
       </h2>
       <p class="mt-4 text-slate-600">
-        We turn curiosity into projects. Learn by doing with guided activities in electronics,
-        programming, math and creative construction.
+        We turn curiosity into projects. Learn by doing with guided activities
+        in electronics, programming, math and creative construction.
       </p>
     </header>
 
     <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {items.map(({ title, desc, icon }) => (
-        <article class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm transition hover:shadow-md">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-pink-50 text-pink-600">
-            <Fragment set:html={icons[icon] ?? icons.software} />
-          </div>
-          <h3 class="mt-4 text-lg font-semibold">{title}</h3>
-          <p class="mt-2 text-sm text-slate-600">{desc}</p>
-        </article>
-      ))}
+      {
+        items.map(({ title, desc, image }) => (
+          <article class="rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md flex flex-col md:flex-row h-[300px]">
+            {/* Contenedor de la imagen */}
+            {image && (
+              <div class="md:w-1/2 w-full h-full overflow-hidden rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none">
+                <img
+                  src={image}
+                  alt={title}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            )}
+
+            {/* Contenedor del texto */}
+            <div class="p-6 flex flex-col justify-center md:w-1/2 w-full">
+              <h3 class="mt-0 text-lg font-semibold">{title}</h3>
+              <p class="mt-2 text-sm text-slate-600">{desc}</p>
+            </div>
+          </article>
+        ))
+      }
     </div>
   </Container>
 </section>
