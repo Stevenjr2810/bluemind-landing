@@ -1,264 +1,280 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
+// -------------------------------------------------------------
+// CONFIGURACIÓN
+// -------------------------------------------------------------
+const API_BASE_URL = 'http://localhost:3001';
+const CLOUD_NAME = "drzikaxoj";
+const FOLDER_NAME = "Gallery"; // Carpeta fija de donde sacar todas las imágenes
+
+// -------------------------------------------------------------
+// VISOR DE GALERÍA MODAL
+// -------------------------------------------------------------
+function GalleryViewer({ items, initialIndex, onClose }) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const currentItem = items[currentIndex];
+
+  const nextItem = useCallback(() => {
+    setCurrentIndex(prev => (prev + 1) % items.length);
+  }, [items.length]);
+
+  const prevItem = useCallback(() => {
+    setCurrentIndex(prev => (prev - 1 + items.length) % items.length);
+  }, [items.length]);
+
+  // Manejo de teclado
+  useEffect(() => {
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight' && items.length > 1) nextItem();
+      if (e.key === 'ArrowLeft' && items.length > 1) prevItem();
+    };
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [onClose, items.length, nextItem, prevItem]);
+
+  if (!currentItem) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      {/* Botón cerrar */}
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 text-white text-2xl bg-white/10 hover:bg-white/20 rounded-full w-12 h-12 flex items-center justify-center transition z-50 shadow-xl"
+        aria-label="Cerrar"
+      >
+        ✕
+      </button>
+
+      <div
+        className="relative w-full max-w-6xl max-h-[95vh] overflow-hidden rounded-xl shadow-2xl bg-zinc-900"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Contenido */}
+        <div className="relative flex items-center justify-center h-[calc(95vh-80px)]">
+          <div className="w-full h-full flex items-center justify-center p-4">
+            {currentItem.type === 'image' ? (
+              <img
+                src={currentItem.secure_url}
+                alt={currentItem.name}
+                className="max-h-full max-w-full object-contain rounded-lg shadow-xl"
+              />
+            ) : (
+              <video
+                controls
+                src={currentItem.secure_url}
+                className="max-h-full max-w-full object-contain rounded-lg shadow-xl"
+                autoPlay
+              >
+                Tu navegador no soporta video.
+              </video>
+            )}
+          </div>
+
+          {/* Controles de navegación */}
+          {items.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); prevItem(); }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/80 rounded-full w-14 h-14 flex items-center justify-center transition"
+                aria-label="Anterior"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12 15.75 4.5" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); nextItem(); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-white bg-black/50 hover:bg-black/80 rounded-full w-14 h-14 flex items-center justify-center transition"
+                aria-label="Siguiente"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-8 h-8">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5 15.75 12 8.25 19.5" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* Footer */}
+        <div className="h-[80px] flex justify-between items-center p-4 bg-zinc-800 border-t border-zinc-700 text-white">
+          <div>
+            <p className="text-lg font-medium">{currentItem.name}</p>
+            <p className="text-sm text-zinc-400">
+              {currentItem.type === 'image' ? '🖼️ Image' : '🎥 Video'}
+            </p>
+          </div>
+          <p className="text-sm text-zinc-400">
+            {currentIndex + 1} / {items.length}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// COMPONENTE PRINCIPAL - COLLAGE GALLERY
+// -------------------------------------------------------------
 export default function ProjectsGallery() {
   const [files, setFiles] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [itemsToShow, setItemsToShow] = useState(6);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
-  // ⚙️ CONFIGURATION
-  const CLOUD_NAME = "drzikaxoj"; // Ensure this is your actual Cloudinary Cloud Name
-  const FOLDER_NAME = "Gallery";
-
-  // 🔧 API endpoint - automatically detects the environment
-  const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
   const API_ENDPOINT = `${API_BASE_URL}/api/gallery/${FOLDER_NAME}`;
 
+  // Fetch de archivos al montar
   useEffect(() => {
     fetchFiles();
   }, []);
 
   const fetchFiles = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      console.log('🔍 Querying:', API_ENDPOINT);
+      console.log('🔍 Cargando galería desde:', API_ENDPOINT);
 
       const response = await fetch(API_ENDPOINT);
-
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: Failed to fetch files. Please ensure your backend is running.`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || `Error ${response.status}`);
       }
 
       const data = await response.json();
-      console.log('✅ Data received:', data);
 
       if (!data.success) {
-        throw new Error(data.error || 'Unknown error');
+        throw new Error(data.error || 'Error al obtener recursos');
       }
 
-      const mediaFiles = data.resources.map(file => ({
+      const mappedFiles = data.resources.map(file => ({
         id: file.public_id,
-        name: file.public_id.split('/').pop(), // Consider cleaning this name for display
+        name: file.public_id.split('/').pop()?.replace(/[-_]/g, ' ') || 'Untitled',
         type: file.resource_type,
-        format: file.format,
+        secure_url: file.secure_url,
         width: file.width,
-        height: file.height
+        height: file.height,
       }));
 
-      setFiles(mediaFiles);
-      setLoading(false);
-    } catch (error) {
-      console.error("❌ Error:", error);
-      setError(error.message);
+      console.log(`✅ ${mappedFiles.length} archivos cargados`);
+      setFiles(mappedFiles);
+    } catch (err) {
+      console.error("❌ Error:", err);
+      setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
 
   const getThumbnailUrl = (file) => {
     if (file.type === 'video') {
-      return `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/w_400,h_300,c_fill,q_auto/${file.id}.jpg`;
+      return `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/w_600,h_600,c_fill,q_auto/${file.id}.jpg`;
     }
-    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_400,h_300,c_fill,q_auto,f_auto/${file.id}`;
+    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_600,h_600,c_fill,q_auto,f_auto/${file.id}`;
   };
 
-  const getFullImageUrl = (file) => {
-    return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_2000,q_auto,f_auto/${file.id}`;
+  const openViewer = (index) => {
+    setSelectedIndex(index);
+    setViewerOpen(true);
   };
 
-  const getVideoUrl = (file) => {
-    return `https://res.cloudinary.com/${CLOUD_NAME}/video/upload/${file.id}.${file.format}`;
+  // Asignar tamaños random para el collage
+  const getRandomSize = (index) => {
+    const sizes = ['small', 'normal', 'wide', 'tall'];
+    // Patrón variado pero controlado
+    const pattern = [1, 0, 2, 1, 3, 1, 1, 2]; // índices del array sizes
+    return sizes[pattern[index % pattern.length]];
   };
 
-  const openItem = (item) => {
-    setCurrentItem(item);
-    setOpen(true);
+  const sizeClasses = {
+    small: 'row-span-1 col-span-1',
+    normal: 'row-span-2 col-span-1',
+    wide: 'row-span-2 col-span-2',
+    tall: 'row-span-3 col-span-1',
   };
-
-  const closeItem = () => {
-    setOpen(false);
-    setCurrentItem(null);
-  };
-
-  const loadMore = () => {
-    setItemsToShow(prev => prev + 6);
-  };
-
-  const displayedFiles = files.slice(0, itemsToShow);
-  const hasMore = itemsToShow < files.length;
 
   return (
-    <section id="projects" className="bg-zinc-950 text-white py-16 sm:py-24 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-semibold text-center mb-8">Our Projects</h2>
+    <>
+      {/* Loading */}
+      {loading && (
+        <div className="text-center py-20">
+          <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-pink-500/20 border-t-pink-500"></div>
+          <p className="mt-4 text-white/70">Loading gallery...</p>
+        </div>
+      )}
 
-        {loading && (
-          <div className="text-center py-20">
-            <div className="inline-block h-10 w-10 animate-spin rounded-full border-4 border-solid border-white/20 border-t-white"></div>
-            <p className="mt-4 text-white/70">Loading projects...</p>
+      {/* Error */}
+      {error && (
+        <div className="max-w-3xl mx-auto bg-red-950/30 border border-red-500/30 rounded-xl p-6">
+          <h3 className="text-red-300 font-semibold mb-2">⚠️ Error loading gallery</h3>
+          <p className="text-red-200/80 text-sm mb-4">{error}</p>
+          <div className="bg-zinc-900 p-4 rounded text-xs text-white/80">
+            <p>Endpoint: <code className="bg-black/30 px-1 rounded">{API_ENDPOINT}</code></p>
           </div>
-        )}
+        </div>
+      )}
 
-        {error && (
-          <div className="max-w-3xl mx-auto bg-red-950/30 border border-red-500/30 rounded-xl p-6">
-            <h3 className="text-red-300 font-semibold mb-2">⚠️ Error loading gallery</h3>
-            <p className="text-red-200/80 text-sm mb-4">{error}</p>
-            <div className="bg-zinc-900 p-4 rounded text-xs text-white/80 space-y-3">
-              <div>
-                <p className="font-semibold mb-1">🔍 Information:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>Backend URL: <code className="bg-black/30 px-1 rounded">{API_BASE_URL}</code></li>
-                  <li>Endpoint: <code className="bg-black/30 px-1 rounded">{API_ENDPOINT}</code></li>
-                </ul>
+      {/* Collage vacío */}
+      {!loading && !error && files.length === 0 && (
+        <div className="text-center py-20">
+          <div className="text-6xl mb-4">📂</div>
+          <p className="text-white/60 text-lg mb-2">No files found</p>
+          <p className="text-white/40 text-sm">
+            Upload images or videos to Cloudinary in the "<strong>{FOLDER_NAME}</strong>" folder
+          </p>
+        </div>
+      )}
+
+      {/* Grid Collage */}
+      {!loading && !error && files.length > 0 && (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 auto-rows-[200px] gap-4">
+          {files.map((file, index) => (
+            <article
+              key={file.id}
+              onClick={() => openViewer(index)}
+              className={`group relative overflow-hidden rounded-xl cursor-pointer ${sizeClasses[getRandomSize(index)]} min-h-[200px] bg-zinc-900`}
+            >
+              {/* Imagen */}
+              <img
+                src={getThumbnailUrl(file)}
+                alt={file.name}
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                loading="lazy"
+              />
+
+              {/* Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+              {/* Badge tipo */}
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="bg-black/70 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                  {file.type === 'video' ? '🎥' : '🖼️'}
+                </span>
               </div>
-              <div className="border-t border-white/10 pt-3">
-                <p className="font-semibold mb-1">🧪 Test manually:</p>
-                <p className="text-white/60">
-                  Open in your browser: <br />
-                  <a
-                    href={API_ENDPOINT}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 break-all underline"
-                  >
-                    {API_ENDPOINT}
-                  </a>
+
+              {/* Nombre al hover */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                <p className="text-white text-sm font-medium truncate">
+                  {file.name}
                 </p>
               </div>
-            </div>
-          </div>
-        )}
-
-        {!loading && !error && files.length === 0 && (
-          <div className="text-center py-20">
-            <div className="text-6xl mb-4">📂</div>
-            <p className="text-white/60 mb-2">No files found</p>
-            <p className="text-white/40 text-sm mb-6">
-              Upload images or videos to Cloudinary in the "<strong>{FOLDER_NAME}</strong>" folder
-            </p>
-            <a
-              href="https://console.cloudinary.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
-            >
-              Go to Cloudinary →
-            </a>
-          </div>
-        )}
-
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displayedFiles.map((file) => (
-            <div
-              key={file.id}
-              className="relative overflow-hidden rounded-xl border border-white/10 bg-zinc-900/50 hover:border-white/20 hover:bg-zinc-900 transition-all cursor-pointer group"
-              onClick={() => openItem(file)}
-            >
-              <div className="relative">
-                <img
-                  src={getThumbnailUrl(file)}
-                  alt={file.name}
-                  className="w-full h-56 object-cover bg-zinc-800"
-                  loading="lazy"
-                />
-
-                {file.type === 'video' && (
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="bg-black/60 rounded-full p-4">
-                      <svg className="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" />
-                      </svg>
-                    </div>
-                  </div>
-                )}
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
-                </div>
-
-                <div className="absolute top-2 right-2">
-                  <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
-                    {file.type === 'video' ? '🎥 Video' : '🖼️ Image'}
-                  </span>
-                </div>
-              </div>
-            </div>
+            </article>
           ))}
         </div>
+      )}
 
-        {!loading && !error && hasMore && (
-          <div className="mt-12 text-center">
-            <button
-              onClick={loadMore}
-              className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg font-medium transition-all duration-200 border border-white/20 hover:border-white/30 hover:scale-105"
-            >
-              Load more
-            </button>
-            <p className="mt-4 text-white/50 text-sm">
-              Showing {displayedFiles.length} of {files.length} files
-            </p>
-          </div>
-        )}
-
-        {open && currentItem && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
-            onClick={closeItem}
-          >
-            <button
-              onClick={closeItem}
-              className="absolute top-4 right-4 text-white text-2xl bg-white/10 hover:bg-white/20 rounded-full w-12 h-12 flex items-center justify-center transition z-50"
-            >
-              ✕
-            </button>
-
-            <div
-              className="relative w-full max-w-6xl max-h-[90vh] overflow-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {currentItem.type === 'image' ? (
-                <div className="bg-zinc-900 rounded-lg overflow-hidden">
-                  <img
-                    src={getFullImageUrl(currentItem)}
-                    alt={currentItem.name}
-                    className="w-full h-auto max-h-[80vh] object-contain mx-auto"
-                  />
-                  <div className="p-4 bg-zinc-800">
-                    <p className="text-white font-medium">{currentItem.name}</p>
-                    <p className="text-white/60 text-sm mt-1">
-                      {currentItem.width} × {currentItem.height} • {currentItem.format.toUpperCase()}
-                    </p>
-                  </div>
-                </div>
-              ) : currentItem.type === 'video' ? (
-                <div className="bg-zinc-900 rounded-lg overflow-hidden">
-                  <video
-                    src={getVideoUrl(currentItem)}
-                    controls
-                    autoPlay
-                    className="w-full h-auto max-h-[80vh]"
-                  >
-                    Your browser does not support the video tag.
-                  </video>
-                  <div className="p-4 bg-zinc-800">
-                    <p className="text-white font-medium">{currentItem.name}</p>
-                    <p className="text-white/60 text-sm mt-1">
-                      {currentItem.width} × {currentItem.height} • {currentItem.format.toUpperCase()}
-                    </p>
-                  </div>
-                </div>
-              ) : null}
-            </div>
-          </div>
-        )}
-
-        {!loading && !error && files.length > 0 && !hasMore && (
-          <div className="mt-8 text-center text-white/60 text-sm">
-            Showing all files ({files.length})
-          </div>
-        )}
-      </div>
-    </section>
+      {/* Visor Modal */}
+      {viewerOpen && files.length > 0 && (
+        <GalleryViewer
+          items={files}
+          initialIndex={selectedIndex}
+          onClose={() => setViewerOpen(false)}
+        />
+      )}
+    </>
   );
 }
-

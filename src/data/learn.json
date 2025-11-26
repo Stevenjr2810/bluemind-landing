@@ -3,24 +3,28 @@
     "title": "Basic Electronics",
     "desc": "Understand circuits, sensors, motors and lights with hands-on activities.",
     "icon": "chip",
-    "image": "/skill1.png"
+    "image": "/skill1.jpg",
+    "folder_name": "electronic"
   },
   {
     "title": "Programming",
     "desc": "Write code to control robots, automate tasks and solve problems.",
     "icon": "code",
-    "image": "/skill2.png"
+    "image": "/skill2.jpg",
+    "folder_name": "programming"
   },
   {
     "title": "Design & Construction",
     "desc": "Build robots with parts, tools and creativity, from idea to prototype.",
     "icon": "wrench",
-    "image": "skill3.png"
+    "image": "/skill3.jpg",
+    "folder_name": "design"
   },
   {
     "title": "Art",
     "desc": "Art provides important benefits such as creativity, emotional expression, stress relief, and improved problem-solving skills.",
     "icon": "art",
-    "image": "/skill4.jpeg"
+    "image": "/skill4.jpeg",
+    "folder_name": "art"
   }
 ]

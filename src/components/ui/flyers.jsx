@@ -1,23 +1,119 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 
+// -------------------------------------------------------------
+// CONFIGURACIÓN
+// -------------------------------------------------------------
+const CLOUD_NAME = "drzikaxoj";
+const FOLDER_NAME = "flyers";
+
+// Detect environment
+let API_BASE_URL = 'http://localhost:3001';
+if (typeof import.meta !== 'undefined' && import.meta.env) {
+  API_BASE_URL = import.meta.env.PUBLIC_API_URL || API_BASE_URL;
+}
+
+const API_ENDPOINT = `${API_BASE_URL}/api/gallery/${FOLDER_NAME}`;
+
+// -------------------------------------------------------------
+// VISOR DE GALERÍA MODAL
+// -------------------------------------------------------------
+function GalleryViewer({ items, initialIndex, onClose }) {
+  const [currentIndex, setCurrentIndex] = useState(initialIndex);
+  const currentItem = items[currentIndex];
+
+  const nextItem = useCallback(() => {
+    setCurrentIndex(prev => (prev + 1) % items.length);
+  }, [items.length]);
+
+  const prevItem = useCallback(() => {
+    setCurrentIndex(prev => (prev - 1 + items.length) % items.length);
+  }, [items.length]);
+
+  useEffect(() => {
+    const handleKeydown = (e) => {
+      if (e.key === 'Escape') onClose();
+      if (e.key === 'ArrowRight' && items.length > 1) nextItem();
+      if (e.key === 'ArrowLeft' && items.length > 1) prevItem();
+    };
+    document.addEventListener('keydown', handleKeydown);
+    return () => document.removeEventListener('keydown', handleKeydown);
+  }, [onClose, items.length, nextItem, prevItem]);
+
+  if (!currentItem) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 text-white text-2xl bg-white/10 hover:bg-white/20 rounded-full w-12 h-12 flex items-center justify-center transition z-50"
+        aria-label="Cerrar"
+      >
+        ✕
+      </button>
+
+      <div
+        className="relative w-full max-w-4xl max-h-[95vh] overflow-hidden rounded-xl shadow-2xl bg-white"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="relative flex items-center justify-center h-[calc(95vh-80px)] bg-gray-100">
+          <img
+            src={currentItem.secure_url}
+            alt={currentItem.name}
+            className="max-h-full max-w-full object-contain"
+          />
+
+          {items.length > 1 && (
+            <>
+              <button
+                onClick={(e) => { e.stopPropagation(); prevItem(); }}
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-900 bg-white/90 hover:bg-white rounded-full w-12 h-12 flex items-center justify-center transition shadow-lg"
+                aria-label="Anterior"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12 15.75 4.5" />
+                </svg>
+              </button>
+              <button
+                onClick={(e) => { e.stopPropagation(); nextItem(); }}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-900 bg-white/90 hover:bg-white rounded-full w-12 h-12 flex items-center justify-center transition shadow-lg"
+                aria-label="Siguiente"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5 15.75 12 8.25 19.5" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
+
+        <div className="h-[80px] flex justify-between items-center p-4 bg-gray-50 border-t border-gray-200">
+          <div>
+            <p className="text-lg font-medium text-slate-900">{currentItem.name}</p>
+            <p className="text-sm text-slate-500">
+              {currentItem.width} × {currentItem.height} • {currentItem.format?.toUpperCase()}
+            </p>
+          </div>
+          <p className="text-sm text-slate-500">
+            {currentIndex + 1} / {items.length}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// -------------------------------------------------------------
+// COMPONENTE PRINCIPAL
+// -------------------------------------------------------------
 export default function FlyersGallery() {
   const [files, setFiles] = useState([]);
-  const [open, setOpen] = useState(false);
-  const [currentItem, setCurrentItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [itemsToShow, setItemsToShow] = useState(6);
-
-  // ⚙️ CONFIGURATION
-  // Ensure your CLOUD_NAME is correct for your Cloudinary account
-  const CLOUD_NAME = "drzikaxoj"; // Replace with your actual Cloud Name if different
-  const FOLDER_NAME = "flyers"; // <--- Specific folder for flyers!
-
-  // 🔧 API endpoint - automatically detects the environment
-  // Ensure 'PUBLIC_API_URL' is configured in your Astro .env file
-  const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
-  // We use the dedicated endpoint you created in the backend
-  const API_ENDPOINT = `${API_BASE_URL}/api/flyers`;
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   useEffect(() => {
     fetchFiles();
@@ -25,76 +121,67 @@ export default function FlyersGallery() {
 
   const fetchFiles = async () => {
     try {
-      console.log('🔍 Querying Flyers endpoint:', API_ENDPOINT);
+      console.log('🔍 Querying:', API_ENDPOINT);
 
       const response = await fetch(API_ENDPOINT);
 
       if (!response.ok) {
-        throw new Error(`Error ${response.status}: Failed to fetch flyers. Please ensure your backend is running and the '/api/flyers' endpoint is functional.`);
+        throw new Error(`Error ${response.status}: Failed to fetch files. Please ensure your backend is running.`);
       }
 
       const data = await response.json();
-      console.log('✅ Flyers data received:', data);
+      console.log('✅ Data received:', data);
 
       if (!data.success) {
-        throw new Error(data.error || 'Unknown error fetching flyers');
+        throw new Error(data.error || 'Unknown error');
       }
 
-      // Filter to ensure we only process images if the backend returns videos as well
-      // Flyers are usually images or PDFs converted to images.
       const flyerFiles = data.resources
-        .filter(file => file.resource_type === 'image') // Ensure we only display images
+        .filter(file => file.resource_type === 'image')
         .map(file => ({
           id: file.public_id,
-          name: file.public_id.split('/').pop()?.replace(/[-_]/g, ' ') || 'Flyer', // More readable name
-          type: file.resource_type, // Should be 'image'
+          name: file.public_id.split('/').pop()?.replace(/[-_]/g, ' ') || 'Flyer',
+          type: file.resource_type,
           format: file.format,
           width: file.width,
           height: file.height,
-          secure_url: file.secure_url // Save the secure URL for the modal
+          secure_url: file.secure_url
         }));
 
       setFiles(flyerFiles);
       setLoading(false);
     } catch (error) {
-      console.error("❌ Error in FlyersGallery:", error);
+      console.error("❌ Error:", error);
       setError(error.message);
       setLoading(false);
     }
   };
 
   const getThumbnailUrl = (file) => {
-    // Generate an optimized thumbnail URL for grid display
     return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_400,h_600,c_fill,q_auto,f_auto,g_auto:subject/${file.id}`;
   };
 
-  const getFullImageUrl = (file) => {
-    // Use the secure URL directly for the high-resolution image in the modal
-    // Cloudinary can automatically serve the optimized image with q_auto, f_auto
-    return file.secure_url;
+  const openViewer = (index) => {
+    setSelectedIndex(index);
+    setViewerOpen(true);
   };
 
-  const openItem = (item) => {
-    setCurrentItem(item);
-    setOpen(true);
+  // Patrón de tamaños verticales
+  const getVerticalSize = (index) => {
+    const pattern = [1, 2, 1, 3, 1, 2, 1, 1];
+    return pattern[index % pattern.length];
   };
 
-  const closeItem = () => {
-    setOpen(false);
-    setCurrentItem(null);
+  const sizeClasses = {
+    1: 'row-span-2',
+    2: 'row-span-3',
+    3: 'row-span-4',
   };
-
-  const loadMore = () => {
-    setItemsToShow(prev => prev + 6);
-  };
-
-  const displayedFiles = files.slice(0, itemsToShow);
-  const hasMore = itemsToShow < files.length;
 
   return (
     <section id="flyers" className="bg-white text-slate-900 py-16 sm:py-24 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-semibold text-center mb-8">Our Flyers</h2>
+        <h2 className="text-3xl font-semibold text-center mb-8 text-pink-600">Our Flyers</h2>
         <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
           Discover our latest flyers about upcoming events, classes, and workshops.
         </p>
@@ -155,86 +242,53 @@ export default function FlyersGallery() {
           </div>
         )}
 
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {displayedFiles.map((file) => (
-            <div
-              key={file.id}
-              className="relative overflow-hidden rounded-xl border border-slate-200 bg-white shadow-lg hover:shadow-xl transition-all cursor-pointer group"
-              onClick={() => openItem(file)}
-            >
-              <div className="relative w-full aspect-[3/4] bg-gray-100"> {/* Adjust aspect ratio for flyers (more vertical) */}
+        {!loading && !error && files.length > 0 && (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 auto-rows-[180px] gap-4">
+            {files.map((file, index) => (
+              <div
+                key={file.id}
+                className={`group relative overflow-hidden rounded-lg cursor-pointer ${sizeClasses[getVerticalSize(index)]} bg-gray-100 shadow-md hover:shadow-xl transition-all duration-300`}
+                onClick={() => openViewer(index)}
+              >
                 <img
                   src={getThumbnailUrl(file)}
                   alt={file.name}
-                  className="w-full h-full object-cover"
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                   loading="lazy"
                 />
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                  <p className="text-white text-sm font-medium truncate w-full">{file.name}</p>
-                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-                <div className="absolute top-2 right-2">
-                  <span className="bg-black/60 backdrop-blur-sm text-white text-xs px-2 py-1 rounded">
+                <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="bg-pink-600/90 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full font-medium">
                     🖼️ Flyer
                   </span>
                 </div>
-              </div>
-            </div>
-          ))}
-        </div>
 
-        {!loading && !error && hasMore && (
-          <div className="mt-12 text-center">
-            <button
-              onClick={loadMore}
-              className="px-8 py-3 bg-pink-600 hover:bg-pink-700 text-white rounded-lg font-medium transition-all duration-200 border border-pink-600 hover:border-pink-700 hover:scale-105"
-            >
-              Load more flyers
-            </button>
-            <p className="mt-4 text-slate-500 text-sm">
-              Showing {displayedFiles.length} of {files.length} flyers
-            </p>
-          </div>
-        )}
-
-        {open && currentItem && (
-          <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 backdrop-blur-sm p-4"
-            onClick={closeItem}
-          >
-            <button
-              onClick={closeItem}
-              className="absolute top-4 right-4 text-white text-2xl bg-white/10 hover:bg-white/20 rounded-full w-12 h-12 flex items-center justify-center transition z-50"
-            >
-              ✕
-            </button>
-
-            <div
-              className="relative w-full max-w-4xl max-h-[90vh] overflow-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="bg-white rounded-lg overflow-hidden">
-                <img
-                  src={getFullImageUrl(currentItem)}
-                  alt={currentItem.name}
-                  className="w-full h-auto max-h-[80vh] object-contain mx-auto"
-                />
-                <div className="p-4 bg-gray-100">
-                  <p className="text-slate-900 font-medium">{currentItem.name}</p>
-                  <p className="text-slate-600 text-sm mt-1">
-                    {currentItem.width} × {currentItem.height} • {currentItem.format.toUpperCase()}
+                <div className="absolute bottom-0 left-0 right-0 p-3 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+                  <p className="text-white text-sm font-medium line-clamp-2 drop-shadow-lg">
+                    {file.name}
                   </p>
                 </div>
+
+                <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-300 bg-gradient-to-br from-white via-transparent to-transparent pointer-events-none"></div>
               </div>
-            </div>
+            ))}
           </div>
         )}
 
-        {!loading && !error && files.length > 0 && !hasMore && (
+        {!loading && !error && files.length > 0 && (
           <div className="mt-8 text-center text-slate-500 text-sm">
             Showing all flyers ({files.length})
           </div>
+        )}
+
+        {viewerOpen && files.length > 0 && (
+          <GalleryViewer
+            items={files}
+            initialIndex={selectedIndex}
+            onClose={() => setViewerOpen(false)}
+          />
         )}
       </div>
     </section>

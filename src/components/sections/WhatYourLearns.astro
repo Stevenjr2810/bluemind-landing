@@ -1,6 +1,9 @@
 ---
 import Container from "../ui/Container.astro";
+// Asegúrate de que este archivo JSON (o learn.json) contenga la propiedad "folder_name"
 import items from "../../data/learn.json";
+// Importamos el nuevo componente React para la interactividad
+import LearnCardsGallery from "../ui/LearnCardsGallery.jsx";
 ---
 
 <section id="features" class="bg-white text-slate-900">
@@ -16,29 +19,11 @@ import items from "../../data/learn.json";
       </p>
     </header>
 
-    <div class="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      {
-        items.map(({ title, desc, image }) => (
-          <article class="rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md flex flex-col md:flex-row h-[300px]">
-            {/* Contenedor de la imagen */}
-            {image && (
-              <div class="md:w-1/2 w-full h-full overflow-hidden rounded-t-2xl md:rounded-l-2xl md:rounded-tr-none">
-                <img
-                  src={image}
-                  alt={title}
-                  class="h-full w-full object-cover"
-                />
-              </div>
-            )}
-
-            {/* Contenedor del texto */}
-            <div class="p-6 flex flex-col justify-center md:w-1/2 w-full">
-              <h3 class="mt-0 text-lg font-semibold">{title}</h3>
-              <p class="mt-2 text-sm text-slate-600">{desc}</p>
-            </div>
-          </article>
-        ))
-      }
+    <!-- Reemplazamos el mapeo en Astro con el componente React -->
+    <!-- Usamos client:load para hidratar el componente y permitir los clics y el modal. -->
+    <div class="mt-10">
+      <!-- Pasamos los datos del JSON al componente React -->
+      <LearnCardsGallery client:load items={items} />
     </div>
   </Container>
 </section>
