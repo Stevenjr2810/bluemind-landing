@@ -20,9 +20,7 @@ const IconPlaceholder = ({ name }) => (
 // -------------------------------------------------------------
 
 // Assumes Astro injects PUBLIC_API_URL or uses localhost fallback
-const API_BASE_URL = typeof import.meta.env.PUBLIC_API_URL !== 'undefined'
-    ? import.meta.env.PUBLIC_API_URL
-    : 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
 
 const CLOUD_NAME = "drzikaxoj"; // Replace with your actual Cloud Name
 

@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback } from "react";
 // -------------------------------------------------------------
 // CONFIGURACIÓN
 // -------------------------------------------------------------
-const API_BASE_URL = 'http://localhost:3001';
+const API_BASE_URL = import.meta.env.PUBLIC_API_URL;
 const CLOUD_NAME = "drzikaxoj";
 const FOLDER_NAME = "Gallery"; // Carpeta fija de donde sacar todas las imágenes
 

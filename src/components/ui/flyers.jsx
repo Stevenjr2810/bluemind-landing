@@ -7,7 +7,7 @@ const CLOUD_NAME = "drzikaxoj";
 const FOLDER_NAME = "flyers";
 
 // Detect environment
-let API_BASE_URL = 'http://localhost:3001';
+let API_BASE_URL = import.meta.env.PUBLIC_API_URL;
 if (typeof import.meta !== 'undefined' && import.meta.env) {
   API_BASE_URL = import.meta.env.PUBLIC_API_URL || API_BASE_URL;
 }
