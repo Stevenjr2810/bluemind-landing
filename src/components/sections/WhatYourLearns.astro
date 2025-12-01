@@ -6,17 +6,28 @@ import items from "../../data/learn.json";
 import LearnCardsGallery from "../ui/LearnCardsGallery.jsx";
 ---
 
-<section id="features" class="bg-white text-slate-900">
+<section id="features" class="bg-geometric-pattern2 text-slate-900">
   <Container class="py-16 sm:py-24">
     <header class="max-w-3xl">
-      <p class="text-sm font-semibold text-pink-600">What you will learn</p>
-      <h2 class="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
-        Practical skills to build, code and innovate
-      </h2>
-      <p class="mt-4 text-slate-600">
-        We turn curiosity into projects. Learn by doing with guided activities
-        in electronics, programming, math and creative construction.
-      </p>
+      <div>
+        <span
+          class="inline-flex items-center gap-2 rounded-full border border-white/50 bg-white/20 px-3 py-1 text-xs/6 text-slate-600"
+        >
+          <span class="h-1.5 w-1.5 rounded-full bg-pink-400"></span>
+          Practical skills to build, code and innovate
+        </span>
+
+        <h2
+          class="mt-4 text-3xl font-bold text-pink-500 tracking-tight sm:text-4xl"
+        >
+          What you will learn
+        </h2>
+
+        <p class="mt-4 text-slate-600">
+          We turn curiosity into projects. Learn by doing with guided activities
+          in electronics, programming, math and creative construction.
+        </p>
+      </div>
     </header>
 
     <!-- Reemplazamos el mapeo en Astro con el componente React -->

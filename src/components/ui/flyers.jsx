@@ -179,10 +179,14 @@ export default function FlyersGallery() {
   };
 
   return (
-    <section id="flyers" className="bg-white text-slate-900 py-16 sm:py-24 min-h-screen">
+    <section id="flyers" className="bg-geometric-pattern2 text-slate-900 py-12 sm:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-3xl font-semibold text-center mb-8 text-pink-600">Our Flyers</h2>
-        <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+        <h2
+          class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl text-pink-500"
+        >
+          Flyers
+        </h2>
+        <p class="mt-4 text-slate-600 mb-6">
           Discover our latest flyers about upcoming events, classes, and workshops.
         </p>
 

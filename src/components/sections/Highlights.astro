@@ -21,10 +21,7 @@ const data = {
 };
 ---
 
-<section
-    id="about"
-    class="bg-gradient-to-b from-blue-900 via-blue-800 to-cyan-700 text-white"
->
+<section id="about" class="bg-geometric-pattern text-white">
     <Container class="py-16 sm:py-24">
         <div class="grid gap-8 lg:grid-cols-2">
             <div>
@@ -39,22 +36,22 @@ const data = {
 
                 <ul class="mt-6 space-y-3 text-white/90">
                     <li class="flex items-center gap-2">
-                        <Baby class="w-5 h-5 text-cyan-400" />
+                        <Baby class="w-5 h-5 text-pink-400" />
                         <span class="font-semibold">Age group:</span>
                         {data.age}
                     </li>
                     <li class="flex items-center gap-2">
-                        <Calendar class="w-5 h-5 text-cyan-400" />
+                        <Calendar class="w-5 h-5 text-pink-400" />
                         <span class="font-semibold">Schedule:</span>
                         {data.days}
                     </li>
                     <li class="flex items-center gap-2">
-                        <DollarSign class="w-5 h-5 text-cyan-400" />
+                        <DollarSign class="w-5 h-5 text-pink-400" />
                         <span class="font-semibold">Private rate:</span>
                         {data.rate}
                     </li>
                     <li class="flex items-center gap-2">
-                        <MapPin class="w-5 h-5 text-cyan-400" />
+                        <MapPin class="w-5 h-5 text-pink-400" />
                         <span class="font-semibold">Location:</span>
                         {data.location}
                     </li>
@@ -73,14 +70,14 @@ const data = {
                         href={`mailto:${data.email}`}
                         class="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 hover:bg-white/15"
                     >
-                        <Mail class="w-5 h-5 text-cyan-400" />
+                        <Mail class="w-5 h-5 text-pink-400" />
                         {data.email}
                     </a>
                     <a
                         href={`tel:${data.phone.replaceAll(" ", "")}`}
                         class="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 hover:bg-white/15"
                     >
-                        <Phone class="w-5 h-5 text-cyan-400" />
+                        <Phone class="w-5 h-5 text-pink-400" />
                         {data.phone}
                     </a>
                     <a
@@ -88,7 +85,7 @@ const data = {
                         target="_blank"
                         class="flex items-center gap-2 rounded-lg bg-white/10 px-4 py-2 hover:bg-white/15"
                     >
-                        <Facebook class="w-5 h-5 text-cyan-400" /> Facebook
+                        <Facebook class="w-5 h-5 text-pink-400" /> Facebook
                     </a>
                 </div>
 

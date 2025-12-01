@@ -7,6 +7,7 @@ import Footer from "../components/Footer.astro";
 /* Importa estilos globales desde el frontmatter (NO uses <link>) */
 import "../styles/tailwind.css";
 import "../styles/global.css";
+import "../styles/patterns.css";
 
 /* Props opcionales del layout */
 interface Props {
@@ -20,6 +21,7 @@ const {
   noindex = false,
 } = Astro.props as Props;
 ---
+
 <html lang="en" class="scroll-smooth">
   <head>
     <Seo {title} {description} {noindex} />

@@ -246,7 +246,7 @@ export default function LearnCardsGallery({ items }) {
                                 openAlbum(item.folder_name);
                             }
                         }}
-                        className="rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:shadow-lg hover:border-pink-600 cursor-pointer flex flex-col md:flex-row h-[300px]"
+                        className="rounded-2xl border border-yellow-200  bg-yellow-100 shadow-sm transition hover:shadow-lg hover:border-pink-600 cursor-pointer flex flex-col md:flex-row h-[300px]"
                     >
                         {/* Image Container */}
                         {item.image && (
