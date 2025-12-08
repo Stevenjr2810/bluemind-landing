@@ -16,3 +16,578 @@
     background-size: cover;
 
 }
+
+.bg-animated-hero {
+    position: relative;
+    background: linear-gradient(135deg, #0066CC 0%, #0088DD 50%, #00AAEE 100%);
+
+}
+
+/* Contenedor de las formas SVG */
+.animated-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+}
+
+/* Estilos para los blobs SVG */
+.shape-blob {
+    position: absolute;
+    opacity: 0.6;
+    filter: blur(60px);
+    animation: float 20s infinite ease-in-out;
+}
+
+.blob-1 {
+    width: 500px;
+    height: 500px;
+    top: -100px;
+    right: -100px;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    width: 400px;
+    height: 400px;
+    bottom: -50px;
+    left: -100px;
+    animation-delay: 3s;
+}
+
+.blob-3 {
+    width: 450px;
+    height: 450px;
+    top: 40%;
+    right: 10%;
+    animation-delay: 6s;
+}
+
+.blob-4 {
+    width: 350px;
+    height: 350px;
+    bottom: 20%;
+    right: -50px;
+    animation-delay: 9s;
+}
+
+/* Puntos decorativos */
+.decorative-dots {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.dot {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: twinkle 3s infinite ease-in-out;
+}
+
+.dot:nth-child(1) {
+    top: 15%;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.dot:nth-child(2) {
+    top: 45%;
+    left: 80%;
+    animation-delay: 0.5s;
+}
+
+.dot:nth-child(3) {
+    top: 70%;
+    left: 30%;
+    animation-delay: 1s;
+}
+
+.dot:nth-child(4) {
+    top: 25%;
+    left: 70%;
+    animation-delay: 1.5s;
+}
+
+.dot:nth-child(5) {
+    top: 85%;
+    left: 60%;
+    animation-delay: 2s;
+}
+
+.dot:nth-child(6) {
+    top: 40%;
+    left: 15%;
+    animation-delay: 2.5s;
+}
+
+/* Círculos de línea */
+.circle-outline {
+    position: absolute;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    animation: pulse 4s infinite ease-in-out;
+}
+
+.circle-1 {
+    width: 100px;
+    height: 100px;
+    top: 10%;
+    left: 10%;
+}
+
+.circle-2 {
+    width: 150px;
+    height: 150px;
+    bottom: 20%;
+    right: 15%;
+    animation-delay: 2s;
+}
+
+/* Patrón de circuitos (opcional) */
+.circuit-pattern {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.15;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10 10h20v20H10zM40 10h20v20H40zM70 10h20v20H70zM10 40h20v20H10zM40 40h20v20H40zM70 40h20v20H70zM10 70h20v20H10zM40 70h20v20H40zM70 70h20v20H70z' stroke='rgba(255,255,255,0.3)' fill='none'/%3E%3C/svg%3E");
+    background-size: 100px 100px;
+}
+
+/* ============================================
+   ANIMACIONES
+   ============================================ */
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translate(0, 0) scale(1);
+    }
+
+    25% {
+        transform: translate(30px, -30px) scale(1.05);
+    }
+
+    50% {
+        transform: translate(-20px, 20px) scale(0.95);
+    }
+
+    75% {
+        transform: translate(20px, 30px) scale(1.02);
+    }
+}
+
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 0.3;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.5);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.6;
+    }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .shape-blob {
+        filter: blur(40px);
+    }
+
+    .blob-1 {
+        width: 350px;
+        height: 350px;
+    }
+
+    .blob-2 {
+        width: 300px;
+        height: 300px;
+    }
+
+    .blob-3 {
+        width: 320px;
+        height: 320px;
+    }
+
+    .blob-4 {
+        width: 280px;
+        height: 280px;
+    }
+}
+
+/* Clase base para secciones con fondo naranja */
+.bg-orange-solid {
+    position: relative;
+    background: linear-gradient(135deg, #ff8800 0%, #ffaa00 50%, #ffcc00 100%);
+}
+
+/* Contenedor de las formas sólidas */
+.solid-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+/* Formas sólidas sin blur */
+.solid-blob {
+    position: absolute;
+    opacity: 0.85;
+    filter: blur(0px);
+    /* Sin desenfoque para formas sólidas */
+    animation: solidFloat 25s infinite ease-in-out;
+    z-index: 0;
+}
+
+/* Posiciones y tamaños de los blobs sólidos */
+.solid-blob-1 {
+    width: 400px;
+    height: 400px;
+    top: -150px;
+    right: -100px;
+    animation-delay: 0s;
+    z-index: 0;
+}
+
+.solid-blob-2 {
+    width: 350px;
+    height: 350px;
+    bottom: -100px;
+    left: -80px;
+    animation-delay: 5s;
+    z-index: 0;
+}
+
+.solid-blob-3 {
+    width: 300px;
+    height: 300px;
+    top: 50%;
+    left: 5%;
+    animation-delay: 10s;
+    z-index: 0;
+}
+
+.solid-blob-4 {
+    width: 280px;
+    height: 280px;
+    bottom: 10%;
+    right: 10%;
+    animation-delay: 15s;
+    z-index: 0;
+}
+
+.solid-blob-5 {
+    width: 320px;
+    height: 320px;
+    top: 20%;
+    right: 30%;
+    animation-delay: 20s;
+    z-index: 0;
+}
+
+/* Formas geométricas adicionales */
+.geometric-shapes {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.geo-circle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 102, 0, 0.3);
+    animation: rotate 30s linear infinite;
+}
+
+.geo-circle-1 {
+    width: 150px;
+    height: 150px;
+    top: 15%;
+    left: 15%;
+}
+
+.geo-circle-2 {
+    width: 100px;
+    height: 100px;
+    top: 60%;
+    right: 20%;
+    animation-delay: 5s;
+    z-index: 0;
+}
+
+/* Triángulos decorativos */
+.geo-triangle {
+    position: absolute;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    animation: pulse 4s infinite ease-in-out;
+    z-index: 0;
+}
+
+.triangle-1 {
+    border-width: 0 60px 104px 60px;
+    border-color: transparent transparent rgba(255, 136, 0, 0.4) transparent;
+    top: 25%;
+    right: 15%;
+    z-index: 0;
+}
+
+.triangle-2 {
+    border-width: 0 45px 78px 45px;
+    border-color: transparent transparent rgba(255, 204, 0, 0.4) transparent;
+    bottom: 30%;
+    left: 20%;
+    animation-delay: 2s;
+    z-index: 0;
+}
+
+/* Puntos sólidos grandes */
+.solid-dots {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.solid-dot {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: bounce 3s infinite ease-in-out;
+    z-index: 0;
+}
+
+.solid-dot-1 {
+    width: 20px;
+    height: 20px;
+    top: 30%;
+    left: 40%;
+    animation-delay: 0s;
+    z-index: 0;
+}
+
+.solid-dot-2 {
+    width: 16px;
+    height: 16px;
+    top: 70%;
+    left: 70%;
+    animation-delay: 0.5s;
+    z-index: 0;
+}
+
+.solid-dot-3 {
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    right: 25%;
+    animation-delay: 1s;
+    z-index: 0;
+}
+
+.solid-dot-4 {
+    width: 18px;
+    height: 18px;
+    bottom: 20%;
+    left: 30%;
+    animation-delay: 1.5s;
+    z-index: 0;
+}
+
+/* Líneas decorativas */
+.deco-lines {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.deco-line {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.2);
+    animation: slideIn 8s infinite ease-in-out;
+    z-index: 0;
+}
+
+.line-1 {
+    width: 200px;
+    height: 3px;
+    top: 35%;
+    right: 10%;
+    transform: rotate(-15deg);
+    z-index: 0;
+}
+
+.line-2 {
+    width: 150px;
+    height: 3px;
+    bottom: 40%;
+    left: 15%;
+    transform: rotate(25deg);
+    animation-delay: 2s;
+    z-index: 0;
+}
+
+/* Cuadrados rotativos */
+.rotating-square {
+    position: absolute;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    animation: rotateSquare 20s linear infinite;
+    z-index: 0;
+}
+
+.square-1 {
+    width: 80px;
+    height: 80px;
+    top: 20%;
+    right: 30%;
+    z-index: 0;
+}
+
+.square-2 {
+    width: 60px;
+    height: 60px;
+    bottom: 25%;
+    left: 40%;
+    animation-delay: 5s;
+    z-index: 0;
+}
+
+/* ============================================
+   ANIMACIONES PARA FORMAS SÓLIDAS
+   ============================================ */
+
+@keyframes solidFloat {
+
+    0%,
+    100% {
+        transform: translate(0, 0) rotate(0deg);
+    }
+
+    25% {
+        transform: translate(20px, -20px) rotate(5deg);
+    }
+
+    50% {
+        transform: translate(-15px, 15px) rotate(-5deg);
+    }
+
+    75% {
+        transform: translate(15px, 20px) rotate(3deg);
+    }
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0) scale(1);
+    }
+
+    50% {
+        transform: translateY(-15px) scale(1.1);
+    }
+}
+
+@keyframes slideIn {
+
+    0%,
+    100% {
+        transform: translateX(0) rotate(-15deg);
+        opacity: 0.2;
+    }
+
+    50% {
+        transform: translateX(20px) rotate(-15deg);
+        opacity: 0.5;
+    }
+}
+
+@keyframes rotateSquare {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive para formas sólidas */
+@media (max-width: 768px) {
+    .solid-blob-1 {
+        width: 300px;
+        height: 300px;
+    }
+
+    .solid-blob-2 {
+        width: 250px;
+        height: 250px;
+    }
+
+    .solid-blob-3 {
+        width: 220px;
+        height: 220px;
+    }
+
+    .solid-blob-4 {
+        width: 200px;
+        height: 200px;
+    }
+
+    .solid-blob-5 {
+        width: 240px;
+        height: 240px;
+    }
+
+    .geo-circle-1 {
+        width: 100px;
+        height: 100px;
+    }
+
+    .geo-circle-2 {
+        width: 70px;
+        height: 70px;
+    }
+}

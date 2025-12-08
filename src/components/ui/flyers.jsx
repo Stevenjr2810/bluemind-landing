@@ -5,6 +5,7 @@ import React, { useState, useEffect, useCallback } from "react";
 // -------------------------------------------------------------
 const CLOUD_NAME = "drzikaxoj";
 const FOLDER_NAME = "flyers";
+//ssa
 
 // Detect environment
 let API_BASE_URL = import.meta.env.PUBLIC_API_URL;
@@ -179,7 +180,98 @@ export default function FlyersGallery() {
   };
 
   return (
-    <section id="flyers" className="bg-geometric-pattern2 text-slate-900 py-12 sm:py-24">
+    <section id="flyers" className="bg-orange-solid relative overflow-hidden text-slate-900 py-12 sm:py-24">
+
+      {/* Formas SVG sólidas */}
+      <div class="solid-shapes">
+        {/* Blob 1 - Naranja Oscuro */}
+        <svg
+          class="solid-blob solid-blob-1"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ff6600"
+            d="M47.1,-57.7C59.9,-45.8,68.5,-29.2,71.2,-11.9C73.9,5.4,70.7,23.4,61.3,37.9C51.9,52.4,36.3,63.4,19.1,68.1C1.9,72.8,-16.9,71.2,-33.5,64.1C-50.1,57,-64.5,44.4,-71.3,28.3C-78.1,12.2,-77.3,-7.4,-70.8,-23.8C-64.3,-40.2,-52.1,-53.4,-38.1,-65C-24.1,-76.6,-8.4,-86.6,5.2,-92.6C18.8,-98.6,34.3,-69.6,47.1,-57.7Z"
+            transform="translate(100 100)"></path>
+        </svg>
+
+        {/* Blob 2 - Amarillo-Naranja */}
+        <svg
+          class="solid-blob solid-blob-2"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ffcc00"
+            d="M39.5,-52.6C49.5,-40.8,55.1,-26.1,58.5,-10.7C61.9,4.7,63.1,20.8,56.8,33.4C50.5,46,36.7,55.1,21.8,60.3C6.9,65.5,-9.1,66.8,-23.8,62.3C-38.5,57.8,-51.9,47.5,-60.4,33.9C-68.9,20.3,-72.5,3.4,-69.3,-12.1C-66.1,-27.6,-56.1,-41.7,-43.3,-53.1C-30.5,-64.5,-15.2,-73.2,0.3,-73.6C15.8,-74,29.5,-64.4,39.5,-52.6Z"
+            transform="translate(100 100)"></path>
+        </svg>
+
+        {/* Blob 3 - Naranja Medio */}
+        <svg
+          class="solid-blob solid-blob-3"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ff8800"
+            d="M44.3,-58.4C56.8,-48.2,65.6,-33.1,68.9,-17C72.2,-0.9,70,16.2,63.2,30.8C56.4,45.4,45,57.5,31.2,64.8C17.4,72.1,1.2,74.6,-14.5,72.3C-30.2,70,-45.4,62.9,-56.9,51.8C-68.4,40.7,-76.2,25.6,-77.5,9.8C-78.8,-6,-73.6,-22.5,-64.3,-36.2C-55,-49.9,-41.6,-60.8,-27.1,-70.3C-12.6,-79.8,2.9,-87.9,18.4,-86.1C33.9,-84.3,31.8,-68.6,44.3,-58.4Z"
+            transform="translate(100 100)"></path>
+        </svg>
+
+        {/* Blob 4 - Amarillo Claro */}
+        <svg
+          class="solid-blob solid-blob-4"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ffe135"
+            d="M35.8,-48.9C45.6,-39.3,52.3,-26.9,56.8,-13.2C61.3,0.5,63.6,15.5,59.3,28.7C55,41.9,44.1,53.3,31.1,59.8C18.1,66.3,3,68,-11.7,66.5C-26.4,65,-40.7,60.3,-51.8,51.3C-62.9,42.3,-70.8,29,-73.3,14.7C-75.8,0.4,-73,-14.9,-65.8,-27.7C-58.6,-40.5,-46.9,-50.8,-34.3,-59.9C-21.7,-69,-8.5,-76.9,3.2,-81.3C14.9,-85.7,26,-85.5,35.8,-48.9Z"
+            transform="translate(100 100)"></path>
+        </svg>
+
+        {/* Blob 5 - Naranja Base */}
+        <svg
+          class="solid-blob solid-blob-5"
+          viewBox="0 0 200 200"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path
+            fill="#ffaa00"
+            d="M42.7,-56.3C54.9,-46.5,64.3,-32.4,67.8,-17.2C71.3,-2,69,14.3,62.3,28.1C55.6,41.9,44.5,53.2,31.1,60.1C17.7,67,-7.9,69.5,-31.2,65.1C-54.5,60.7,-75.5,49.4,-83.1,32.8C-90.7,16.2,-84.9,-5.7,-75.3,-23.5C-65.7,-41.3,-52.3,-55,-37.4,-64.4C-22.5,-73.8,-6.1,-78.9,8.4,-89.1C22.9,-99.3,30.5,-66.1,42.7,-56.3Z"
+            transform="translate(100 100)"></path>
+        </svg>
+      </div>
+
+      {/* Formas geométricas */}
+      <div class="geometric-shapes">
+        <div class="geo-circle geo-circle-1"></div>
+        <div class="geo-circle geo-circle-2"></div>
+        <div class="geo-triangle triangle-1"></div>
+        <div class="geo-triangle triangle-2"></div>
+      </div>
+
+      {/* Puntos sólidos */}
+      <div class="solid-dots">
+        <div class="solid-dot solid-dot-1"></div>
+        <div class="solid-dot solid-dot-2"></div>
+        <div class="solid-dot solid-dot-3"></div>
+        <div class="solid-dot solid-dot-4"></div>
+      </div>
+
+      {/* Líneas decorativas */}
+      <div class="deco-lines">
+        <div class="deco-line line-1"></div>
+        <div class="deco-line line-2"></div>
+      </div>
+
+      {/* Cuadrados rotativos */}
+      <div class="rotating-square square-1"></div>
+      <div class="rotating-square square-2"></div>
+
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <h2
           class="mt-4 text-3xl font-bold tracking-tight sm:text-4xl text-pink-500"

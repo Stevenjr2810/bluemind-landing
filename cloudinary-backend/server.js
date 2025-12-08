@@ -9,13 +9,13 @@ const corsOptions = {
   origin: [
     'http://localhost:4321',
     'http://localhost:3000',
-    'https://bluemindr.netlify.app',    // ✅ Tu sitio
-    'https://*.netlify.app'            // Para previews
+    'https://bluemindr.netlify.app',
+    'https://*.netlify.app'
   ],
   credentials: true
 };
 
-app.use(cors(corsOptions)); // Usar corsOptions en app.use(cors)
+app.use(cors(corsOptions));
 app.use(express.json());
 
 cloudinary.config({
@@ -26,6 +26,42 @@ cloudinary.config({
 
 // Lista de carpetas que pueden ser consultadas
 const allowedFolders = ['gallery', 'flyers', 'electronic', 'programming', 'design', 'art'];
+
+/**
+ * Función auxiliar para extraer solo los campos clave y la descripción.
+ * @param {object} resource - Objeto de recurso retornado por Cloudinary.
+ */
+const extractResourceData = (resource) => {
+  // La descripción se almacena dentro de context.custom.description
+  const description =
+    resource.context && resource.context.custom && resource.context.custom.alt
+      ? resource.context.custom.alt
+      : null; // Si no hay descripción, devuelve null
+
+  return {
+    asset_id: resource.asset_id,
+    public_id: resource.public_id,
+    format: resource.format,
+    version: resource.version,
+    resource_type: resource.resource_type,
+    created_at: resource.created_at,
+    bytes: resource.bytes,
+    width: resource.width,
+    height: resource.height,
+    asset_folder: resource.asset_folder,
+    display_name: resource.display_name,
+    url: resource.url,
+    secure_url: resource.secure_url,
+    context: resource.context,
+    description: description, // ✅ NUEVO CAMPO DE DESCRIPCIÓN
+  };
+};
+
+
+
+// ----------------------------------------
+// RUTAS
+// ----------------------------------------
 
 // RUTAS DE INICIO (HOME)
 app.get('/', (req, res) => {
@@ -41,6 +77,7 @@ app.get('/', (req, res) => {
   });
 });
 
+
 // 📁 Obtener TODA la galería (todos los asset_folder)
 app.get('/api/gallery', async (req, res) => {
   try {
@@ -50,12 +87,14 @@ app.get('/api/gallery', async (req, res) => {
       cloudinary.api.resources({
         type: 'upload',
         max_results: 500,
-        resource_type: 'image'
+        resource_type: 'image',
+        context: true // Solicitar metadatos de contexto (donde está la descripción)
       }),
       cloudinary.api.resources({
         type: 'upload',
         max_results: 500,
-        resource_type: 'video'
+        resource_type: 'video',
+        context: true // Solicitar metadatos de contexto (donde está la descripción)
       })
     ]);
 
@@ -64,9 +103,13 @@ app.get('/api/gallery', async (req, res) => {
       ...videos.resources.map(r => ({ ...r, resource_type: 'video' }))
     ];
 
+    // Mapear para extraer la descripción
+    const mappedResources = allResources.map(extractResourceData);
+
+
     // Agrupar por asset_folder
     const grouped = {};
-    allResources.forEach(resource => {
+    mappedResources.forEach(resource => {
       // Usar 'Sin carpeta' si no tiene asset_folder
       const folder = resource.asset_folder || 'Sin carpeta';
       if (!grouped[folder]) {
@@ -75,15 +118,15 @@ app.get('/api/gallery', async (req, res) => {
       grouped[folder].push(resource);
     });
 
-    console.log(`✅ Total: ${allResources.length} archivos`);
+    console.log(`✅ Total: ${mappedResources.length} archivos`);
     console.log(`📁 Carpetas encontradas:`, Object.keys(grouped));
 
     res.json({
       success: true,
-      total: allResources.length,
+      total: mappedResources.length,
       folders: Object.keys(grouped),
       grouped_by_folder: grouped,
-      all_resources: allResources
+      all_resources: mappedResources
     });
 
   } catch (error) {
@@ -95,13 +138,13 @@ app.get('/api/gallery', async (req, res) => {
   }
 });
 
+
 // 📁 Obtener archivos de una carpeta específica (por asset_folder)
-// ESTA RUTA YA MANEJA TODAS TUS CARPETAS (electronic, programming, design, art, flyers, gallery)
 app.get('/api/gallery/:folder', async (req, res) => {
   try {
     const { folder } = req.params;
 
-    // Validación simple para evitar llamadas a carpetas no deseadas o mal escritas
+    // Validación simple...
     if (!allowedFolders.includes(folder.toLowerCase())) {
       return res.status(400).json({
         success: false,
@@ -112,17 +155,19 @@ app.get('/api/gallery/:folder', async (req, res) => {
 
     console.log(`\n📂 Buscando archivos con asset_folder: "${folder}"`);
 
-    // Obtener TODOS los recursos (optimización: buscar por etiqueta o prefijo si el número de recursos es MUY alto)
+    // Obtener TODOS los recursos
     const [images, videos] = await Promise.all([
       cloudinary.api.resources({
         type: 'upload',
         max_results: 500,
-        resource_type: 'image'
+        resource_type: 'image',
+        context: true // <-- PASO CLAVE 1
       }),
       cloudinary.api.resources({
         type: 'upload',
         max_results: 500,
-        resource_type: 'video'
+        resource_type: 'video',
+        context: true // <-- PASO CLAVE 1
       })
     ]);
 
@@ -131,8 +176,11 @@ app.get('/api/gallery/:folder', async (req, res) => {
       ...videos.resources.map(r => ({ ...r, resource_type: 'video' }))
     ];
 
+    // Mapear para extraer la descripción
+    const mappedResources = allResources.map(extractResourceData);
+
     // FILTRAR por asset_folder (case-insensitive)
-    const filtered = allResources.filter(resource =>
+    const filtered = mappedResources.filter(resource =>
       resource.asset_folder && resource.asset_folder.toLowerCase() === folder.toLowerCase()
     );
 
@@ -152,7 +200,7 @@ app.get('/api/gallery/:folder', async (req, res) => {
       success: true,
       folder: folder,
       total: filtered.length,
-      resources: filtered
+      resources: filtered // Incluye los recursos con la descripción mapeada
     });
 
   } catch (error) {
@@ -164,21 +212,19 @@ app.get('/api/gallery/:folder', async (req, res) => {
   }
 });
 
-// ELIMINAMOS EL ENDPOINT DEDICADO /api/flyers
-// Ya no es necesario, ya que GET /api/gallery/flyers hace exactamente lo mismo.
-
+// ... (El endpoint /api/flyers ya fue eliminado, como mencionaste)
 
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`
-    🚀 Servidor corriendo en http://localhost:${PORT}
-    
-    📍 Endpoints:
-      📦 GET http://localhost:${PORT}/api/gallery (TODOS los archivos, agrupados)
-      📁 GET http://localhost:${PORT}/api/gallery/electronic (Archivos de electrónica)
-      📁 GET http://localhost:${PORT}/api/gallery/programming (Archivos de programación)
-      📁 GET http://localhost:${PORT}/api/gallery/design (Archivos de diseño)
-      📁 GET http://localhost:${PORT}/api/gallery/art (Archivos de arte)
-      📁 GET http://localhost:${PORT}/api/gallery/flyers (Archivos de flyers)
-    `);
+    🚀 Servidor corriendo en http://localhost:${PORT}
+    
+    📍 Endpoints:
+      📦 GET http://localhost:${PORT}/api/gallery (TODOS los archivos, agrupados)
+      📁 GET http://localhost:${PORT}/api/gallery/electronic (Archivos de electrónica)
+      📁 GET http://localhost:${PORT}/api/gallery/programming (Archivos de programación)
+      📁 GET http://localhost:${PORT}/api/gallery/design (Archivos de diseño)
+      📁 GET http://localhost:${PORT}/api/gallery/art (Archivos de arte)
+      📁 GET http://localhost:${PORT}/api/gallery/flyers (Archivos de flyers)
+    `);
 });
